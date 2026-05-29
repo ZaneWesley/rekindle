@@ -1199,10 +1199,11 @@ async function renderFeed(customPassageData = null) {
     }
 
     function handleDoubleTapHighlight(cardElement) {
-      toggleCardHighlight(cardElement.dataset.cardId);
+      // Double-tap always *adds* a persistent highlight (idempotent).
+      addCardHighlight(cardElement.dataset.cardId);
     }
 
-    function toggleCardHighlight(cardId) {
+    function addCardHighlight(cardId) {
       const card = document.querySelector(`[data-card-id="${cardId}"]`);
       if (!card) return;
 
@@ -1210,13 +1211,9 @@ async function renderFeed(customPassageData = null) {
       if (tokens.length === 0) return;
 
       const existingIdx = state.savedHighlights.findIndex(h => h.id === cardId);
-      const isAlreadyHighlighted = existingIdx > -1;
+      if (existingIdx > -1) return; // already added
+
       const defaultColor = state.defaultHighlightColor || 'bg-yellow-500/20';
-
-      if (isAlreadyHighlighted) {
-        return;
-      }
-
       const book = tokens[0].getAttribute('data-book');
       const chap = parseInt(tokens[0].getAttribute('data-chap'));
       const verseNums = tokens.map(t => parseInt(t.getAttribute('data-vnum'))).filter(Boolean);
@@ -1248,6 +1245,42 @@ async function renderFeed(customPassageData = null) {
       saveToLocalStorage();
       saveAppSettings();
       renderSavedHighlightsList();
+    }
+
+    function removeCardHighlight(cardId) {
+      const card = document.querySelector(`[data-card-id="${cardId}"]`);
+      if (!card) return;
+
+      const tokens = Array.from(card.querySelectorAll('.verse-token'));
+      if (tokens.length === 0) return;
+
+      const existingIdx = state.savedHighlights.findIndex(h => h.id === cardId);
+      if (existingIdx === -1) return; // nothing to remove
+
+      state.savedHighlights.splice(existingIdx, 1);
+
+      tokens.forEach(token => {
+        token.className = `verse-token transition-colors duration-300 rounded`;
+      });
+
+      const highlightBtn = card.querySelector('.highlight-toggle-button');
+      if (highlightBtn) {
+        highlightBtn.classList.remove('text-red-500', 'hover:text-red-400');
+        highlightBtn.classList.add('text-muted', 'hover:text-emerald-400');
+      }
+
+      saveToLocalStorage();
+      saveAppSettings();
+      renderSavedHighlightsList();
+    }
+
+    function toggleCardHighlight(cardId) {
+      const idx = state.savedHighlights.findIndex(h => h.id === cardId);
+      if (idx === -1) {
+        addCardHighlight(cardId);
+      } else {
+        removeCardHighlight(cardId);
+      }
     }
 
     function triggerHeartBurst(cardId) {
@@ -1521,15 +1554,57 @@ async function renderFeed(customPassageData = null) {
       }, { passive: true });
     }
 
+    function animateViewSwitch(viewTarget) {
+      const mapping = { trending: 'feedView', browse: 'browseView', saved: 'savedView' };
+      const newId = mapping[viewTarget];
+      const newEl = document.getElementById(newId);
+
+      // find currently visible view
+      let currentEl = null;
+      Object.values(mapping).forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (el.style.display && el.style.display !== 'none') currentEl = el;
+      });
+
+      if (currentEl === newEl) return;
+
+      const outDir = currentEl && newEl ? (Array.from(document.querySelectorAll('.main-tabs button')).indexOf(document.getElementById(`tab-${viewTarget}`)) > Array.from(document.querySelectorAll('.main-tabs button')).indexOf(document.querySelector('.main-tabs button')) ? -1 : 1) : 1;
+
+      if (currentEl) {
+        currentEl.style.transition = 'transform .32s ease, opacity .28s ease';
+        currentEl.style.transform = `translateX(${outDir * 12}px)`;
+        currentEl.style.opacity = '0';
+        setTimeout(() => {
+          currentEl.style.display = 'none';
+          currentEl.style.transition = '';
+          currentEl.style.transform = '';
+          currentEl.style.opacity = '';
+        }, 320);
+      }
+
+      if (newEl) {
+        newEl.style.display = (viewTarget === 'trending' ? 'flex' : 'block');
+        newEl.style.opacity = '0';
+        newEl.style.transform = `translateX(${(currentEl ? -outDir : 0) * 12}px)`;
+        newEl.style.transition = 'transform .32s ease, opacity .28s ease';
+
+        requestAnimationFrame(() => {
+          newEl.style.transform = 'translateX(0)';
+          newEl.style.opacity = '1';
+          setTimeout(() => {
+            newEl.style.transition = '';
+            newEl.style.transform = '';
+            newEl.style.opacity = '';
+          }, 340);
+        });
+      }
+    }
+
     function switchView(viewTarget) {
       state.activeView = viewTarget;
 
       document.getElementById('readingHeader').classList.add('hidden');
-      
-      // Reset layout visibilities
-      document.getElementById('feedView').style.display = 'none';
-      document.getElementById('browseView').style.display = 'none';
-      document.getElementById('savedView').style.display = 'none';
       
       // Clean tab selection highlighting CSS states
       ['trending', 'browse', 'saved'].forEach(v => {
@@ -1541,13 +1616,14 @@ async function renderFeed(customPassageData = null) {
       const activeTabElement = document.getElementById(`tab-${viewTarget}`);
       activeTabElement.className = "flex-1 py-2 text-center rounded-lg text-emerald-400 bg-primary-strong font-semibold shadow-sm transition-all";
 
+      // animate the view switch and then trigger appropriate render hooks
+      animateViewSwitch(viewTarget);
+
       if (viewTarget === 'trending') {
-        document.getElementById('feedView').style.display = 'flex';
         renderTrendingAlgorithmicShuffle();
       } else if (viewTarget === 'browse') {
-        document.getElementById('browseView').style.display = 'block';
+        // nothing additional required
       } else if (viewTarget === 'saved') {
-        document.getElementById('savedView').style.display = 'block';
         renderSavedHighlightsList();
       }
     }
