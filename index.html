@@ -81,14 +81,20 @@
     /* Smooth Snap Scrolling Properties */
     .snap-container {
       scroll-snap-type: y mandatory;
-      scroll-padding-top: 1rem;
+      scroll-padding-top: 4rem;
+    }
+    main {
+      touch-action: pan-y;
     }
     .snap-card {
       scroll-snap-align: start;
       scroll-snap-stop: always;
-      min-height: calc(100vh - 4rem);
-      max-height: calc(100vh - 4rem);
+      min-height: calc(100vh - 12rem);
+      height: auto;
       box-sizing: border-box;
+    }
+    .snap-card > .flex-1 {
+      min-height: 0;
     }
 
     .confetti-container {
@@ -155,22 +161,31 @@
 
     .main-tabs {
       position: fixed;
-      max-width: 500px;
-      width: fit-content;
-      /* max-height: 100px; */
-      bottom: 1em;
-      left: 50%;
-      transform: translateX(-50%);
+      inset: auto 0 0 0;
+      width: 100%;
+      max-width: none;
+      /* padding: 0 1rem 1rem; */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 28px 28px 0 0;
+      isolation: isolate;
+      touch-action: none;
+      box-shadow: 0px -1px 18px rgba(0, 0, 0, 0.12);
+      background-color: transparent;
+      z-index: 20;
+    }
+    .main-tabs > div {
+      width: 100%;
+      max-width: 100%;
       display: flex;
       justify-content: space-around;
       align-items: center;
       border-radius: 28px;
-      isolation: isolate;
-      touch-action: none;
-      box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
       background-color: var(--surface-soft);
       backdrop-filter: blur(10px) opacity(0.6);
-      z-index: 20;
+      padding: 0.5rem 0.5rem;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
     }
     .main-tabs button {
       border: none;
@@ -710,6 +725,7 @@
       configureSettingsControls();
       renderFeed();
       switchView('trending');
+      setupTabSwipeGestures();
     });
 
     // Fetch and fill top free translation configurations
@@ -871,12 +887,11 @@ async function renderFeed(customPassageData = null) {
             text: v.text.trim()
           }));
 
-          const chunkSize = 3;
+          const verseGroups = groupVersesForCards(totalVerses, 40);
 
-          for (let i = 0; i < totalVerses.length; i += chunkSize) {
-            const verseSlice = totalVerses.slice(i, i + chunkSize);
-            cardsHTML += compileCardMarkup(verseSlice, bookName, chapterNum);
-          }
+          verseGroups.forEach(group => {
+            cardsHTML += compileCardMarkup(group, bookName, chapterNum);
+          });
 
           const hasNextChapter = currentBookData && state.currentChapter < currentBookData.chapters;
           if (hasNextChapter) {
@@ -920,7 +935,7 @@ async function renderFeed(customPassageData = null) {
 
     function renderNextChapterCard(bookName, nextChapterNum) {
       return `
-        <div class="snap-card next-chapter-trigger w-full h-full flex-shrink-0 flex flex-col justify-center items-center p-6 relative card-surface border-b border-theme">
+        <div class="snap-card next-chapter-trigger w-full h-full flex-shrink-0 flex flex-col justify-center items-center p-5 relative card-surface border-b border-theme">
           <div class="text-center z-10 max-w-sm mx-auto">
             <p class="text-sm font-semibold text-primary mb-2">Chapter complete</p>
             <p class="text-xs text-muted mb-6">Ready to continue with ${bookName} ${nextChapterNum}?</p>
@@ -1025,6 +1040,38 @@ async function renderFeed(customPassageData = null) {
       renderFeed();
     }
 
+    function groupVersesForCards(verses, maxWords = 40) {
+      const groups = [];
+      let currentGroup = [];
+      let currentCount = 0;
+
+      for (const verse of verses) {
+        const verseWords = verse.text.trim().split(/\s+/).filter(Boolean).length;
+        const shouldStartNewCard = currentGroup.length > 0 && currentCount + verseWords > maxWords;
+
+        if (shouldStartNewCard) {
+          groups.push(currentGroup);
+          currentGroup = [];
+          currentCount = 0;
+        }
+
+        currentGroup.push(verse);
+        currentCount += verseWords;
+
+        if (currentGroup.length === 1 && verseWords > maxWords) {
+          groups.push(currentGroup);
+          currentGroup = [];
+          currentCount = 0;
+        }
+      }
+
+      if (currentGroup.length > 0) {
+        groups.push(currentGroup);
+      }
+
+      return groups;
+    }
+
     // Process array chunks into structural HTML layout
     function compileCardMarkup(verses, bookName, chapterNum) {
       const uniqueCardId = `${bookName.replace(/\s+/g, '')}-${chapterNum}-${verses[0].number}`;
@@ -1075,10 +1122,10 @@ async function renderFeed(customPassageData = null) {
       }).join(' ');
 
       return `
-        <div class="snap-card w-full h-full flex-shrink-0 flex flex-col justify-between p-6 relative card-surface border-b border-theme" data-card-id="${uniqueCardId}">
+        <div class="snap-card w-full h-full flex-shrink-0 flex flex-col justify-between p-5 relative card-surface border-b border-theme" data-card-id="${uniqueCardId}">
           <div class="absolute inset-0 bg-radial from-emerald-500/5 via-transparent to-transparent pointer-events-none opacity-40"></div>
           
-          <div class="flex justify-between items-center z-10 pt-4">
+          <div class="flex justify-between items-center z-10 pt-3">
             <span class="text-xs font-semibold tracking-wider text-muted uppercase flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${refString}
             </span>
@@ -1086,10 +1133,10 @@ async function renderFeed(customPassageData = null) {
           </div>
 
           <div class="flex-1 flex flex-col justify-center my-auto z-10 max-w-sm mx-auto">
-            <p class="serif-scripture text-[21px] leading-[1.65] text-primary tracking-wide select-none">
+            <p class="serif-scripture text-[19px] leading-[1.55] text-primary tracking-wide select-none">
               ${innerVersesHTML}
             </p>
-            <p class="text-[10px] text-muted text-center mt-6 tracking-wide italic">Tip:Double-tap to highlight</p>
+            <p class="text-[10px] text-muted text-center mt-4 tracking-wide italic">Tip: Double-tap to highlight</p>
           </div>
 
           <div class="heart-burst" id="heartBurst-${uniqueCardId}"><span class="material-symbols-rounded">favorite</span></div>
@@ -1420,6 +1467,60 @@ async function renderFeed(customPassageData = null) {
     }
 
     // Global App Navigation and Router engine
+    const TAB_VIEWS = ['trending', 'browse', 'saved'];
+
+    function getAdjacentTab(viewTarget, direction) {
+      const idx = TAB_VIEWS.indexOf(viewTarget);
+      if (idx === -1) return null;
+      const nextIndex = idx + direction;
+      return TAB_VIEWS[nextIndex] || null;
+    }
+
+    function setupTabSwipeGestures() {
+      const container = document.querySelector('main');
+      if (!container || !window.TouchEvent) return;
+
+      let startX = 0;
+      let startY = 0;
+      let tracking = false;
+
+      container.addEventListener('touchstart', (event) => {
+        if (event.touches.length !== 1) return;
+        const target = event.target;
+        if (target instanceof Element && target.closest('button, input, textarea, select, a')) return;
+
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+        tracking = true;
+      }, { passive: true });
+
+      container.addEventListener('touchmove', (event) => {
+        if (!tracking) return;
+        const deltaX = event.touches[0].clientX - startX;
+        const deltaY = event.touches[0].clientY - startY;
+
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
+          event.preventDefault();
+        }
+      }, { passive: false });
+
+      container.addEventListener('touchend', (event) => {
+        if (!tracking || event.changedTouches.length !== 1) return;
+        tracking = false;
+
+        const endX = event.changedTouches[0].clientX;
+        const endY = event.changedTouches[0].clientY;
+        const deltaX = endX - startX;
+        const deltaY = endY - startY;
+
+        if (Math.abs(deltaX) < 60 || Math.abs(deltaX) < Math.abs(deltaY) * 1.5) return;
+
+        const direction = deltaX < 0 ? 1 : -1;
+        const nextView = getAdjacentTab(state.activeView, direction);
+        if (nextView) switchView(nextView);
+      }, { passive: true });
+    }
+
     function switchView(viewTarget) {
       state.activeView = viewTarget;
 
