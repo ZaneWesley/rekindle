@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Aura Bible</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,300,0,0" />
+  
+  <style>
+    :root {
+      --bg-primary: rgb(255, 255, 255);
+      --bg-primary-rgb: 255, 255, 255;
+      --text-primary: rgb(12, 16, 20);
+      --text-muted: rgba(12, 16, 20, 0.64);
+      --surface-strong: rgba(255, 255, 255, 0.8);
+      --surface-soft: rgba(255, 255, 255, 0.95);
+      --border-theme: rgba(15, 23, 42, 0.18);
+    }
+
+    html.dark {
+      --bg-primary: rgb(12, 16, 20);
+      --bg-primary-rgb: 12, 16, 20;
+      --text-primary: rgb(245, 245, 245);
+      --text-muted: rgba(245, 245, 245, 0.68);
+      --surface-strong: rgba(12, 16, 20, 0.8);
+      --surface-soft: rgba(12, 16, 20, 0.95);
+      --border-theme: rgba(148, 163, 184, 0.2);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-primary);
+      background-color: var(--bg-primary);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .serif-scripture {
+      font-family: 'Playfair Display', serif;
+    }
+
+    .bg-primary {
+      background-color: var(--bg-primary) !important;
+    }
+
+    .bg-primary-soft {
+      background-color: var(--surface-soft) !important;
+    }
+
+    .bg-primary-strong {
+      background-color: var(--surface-strong) !important;
+    }
+
+    .border-theme {
+      border-color: var(--border-theme) !important;
+    }
+
+    .text-primary {
+      color: var(--text-primary) !important;
+    }
+
+    .text-muted {
+      color: var(--text-muted) !important;
+    }
+
+    .card-surface {
+      background: linear-gradient(180deg, rgba(var(--bg-primary-rgb), 0.98) 0%, rgba(var(--bg-primary-rgb), 0.96) 40%, rgba(var(--bg-primary-rgb), 0.92) 100%);
+    }
+
+    /* Hide scrollbar for Cleanliness */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Smooth Snap Scrolling Properties */
+    .snap-container {
+      scroll-snap-type: y mandatory;
+      scroll-padding-top: 4rem;
+    }
+    .snap-card {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      min-height: calc(100vh - 4rem);
+      height: auto;
+      box-sizing: border-box;
+    }
+
+    .confetti-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      border-radius: 3px;
+      opacity: 0;
+      pointer-events: none;
+      transform-origin: center center;
+      width: 10px; height: 24px;
+      animation: confettiPop 2s forwards;
+    }
+
+    @keyframes confettiPop {
+      0% {
+        opacity: 1;
+        transform: rotate(0deg) scale(0.4);
+      }
+
+      100% {
+        opacity: 0;
+        transform: rotate(560deg) scale(0.7);
+      }
+    }
+
+    .heart-burst {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(0.75);
+      transition: opacity 0.2s ease, transform 0.3s ease;
+      z-index: 20;
+    }
+
+    .heart-burst.animate {
+      opacity: 1;
+      animation: heartPop 0.8s ease forwards;
+    }
+
+    .heart-burst span {
+      font-size: 3rem;
+      color: rgba(239, 68, 68, 0.95);
+      text-shadow: 0 0 22px rgba(248, 113, 113, 0.5);
+    }
+
+    @keyframes heartPop {
+      0% { opacity: 0; transform: scale(0.5); }
+      20% { opacity: 1; transform: scale(1.25); }
+      60% { opacity: 1; transform: scale(1.05); }
+      100% { opacity: 0; transform: scale(1.6); }
+    }
+
+    .main-tabs {
+      position: fixed;
+      max-width: 500px;
+      width: fit-content;
+      /* max-height: 100px; */
+      bottom: 1em;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-radius: 28px;
+      isolation: isolate;
+      touch-action: none;
+      box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.2);
+      background-color: var(--surface-soft);
+      backdrop-filter: blur(10px) opacity(0.6);
+      z-index: 20;
+    }
+    .main-tabs button {
+      border: none;
+      background-color: transparent;
+      padding: 12px;
+      cursor: pointer;
+      color: #4E5D6C;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .main-tabs button span {
+      font-size: 2rem;
+    }
+
+    #chaptersGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      gap: 12px;
+      overflow-y: auto;
+    }
+    #chaptersGrid button {
+      aspect-ratio: 1 / 1;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-theme);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col justify-between overflow-hidden select-none bg-primary text-primary">
+
+  <header class="w-full bg-primary-strong backdrop-blur-md border-b border-theme z-40 px-4 pt-3 pb-2 shrink-0">
+    <div class="max-w-md mx-auto flex flex-col gap-3">
+      <div class="flex justify-between items-center">
+        <h1 class="text-xl font-semibold tracking-tight text-emerald-400 flex items-center gap-1.5">
+          <span class="material-symbols-rounded text-emerald-400">auto_awesome</span> BIBLE
+        </h1>
+        <div class="flex items-center gap-3">
+          <button onclick="openSettingsPage()" class="w-9 h-9 rounded-full bg-primary border border-theme flex items-center justify-center text-muted hover:text-emerald-400 transition-colors">
+            <span class="material-symbols-rounded">settings</span>
+          </button>
+        </div>
+      </div>
+      
+      
+</div>
+</header>
+
+<nav class="main-tabs">
+<!-- <nav class="fixed bottom-0 inset-x-0 z-50 bg-primary-soft backdrop-blur-md border-t border-theme px-4 py-2 max-w-md mx-auto"> -->
+  <div class="flex bg-primary p-1 rounded-2xl text-xs font-medium">
+    <!-- <button onclick="switchView('trending')" id="tab-trending" class="flex-1 py-2.5 text-center rounded-xl text-muted transition-all">🔥 Trending</button> -->
+    <button onclick="switchView('trending')" id="tab-trending" class=""><span class="material-symbols-rounded">home</span></button>
+    <button onclick="switchView('browse')" id="tab-browse" class=""><span class="material-symbols-rounded">book_2</span></button>
+    <button onclick="switchView('saved')" id="tab-saved" class=""><span class="material-symbols-rounded">bookmark</span></button>
+  </div>
+</nav>
+
+
+  
+<main class="flex-1 max-w-md w-full mx-auto relative overflow-hidden bg-primary">
+
+    <div id="readingHeader" class="hidden absolute top-0 inset-x-0 z-30 bg-primary-soft backdrop-blur-md border-b border-theme px-4 py-3">
+      <div class="flex items-center justify-between">
+        <button onclick="returnToBrowse()" class="flex items-center gap-1.5 text-muted text-sm font-medium hover:text-emerald-400 transition-colors">
+          <span class="material-symbols-rounded text-base">arrow_back</span>
+          Browse
+        </button>
+
+        <div class="text-right">
+          <p id="readingHeaderTitle" class="text-sm font-semibold text-emerald-400"></p>
+          <p class="text-[10px] uppercase tracking-wider text-muted">Reading Mode</p>
+        </div>
+      </div>
+    </div>
+
+    
+    <div id="feedView" class="h-full overflow-y-auto snap-container no-scrollbar hidden flex-col pt-16 pb-28">
+      </div>
+
+    <div id="confettiContainer" class="confetti-container"></div>
+
+    <div id="browseView" class="h-full overflow-y-auto no-scrollbar p-5 hidden pb-32">
+      <h2 class="text-lg font-medium text-primary mb-4 flex items-center gap-2">
+        <span class="material-symbols-rounded text-emerald-400">menu_book</span> Books of the Bible
+      </h2>
+      <div id="booksGrid" class="grid grid-cols-2 gap-2.5">
+        </div>
+      
+      <div id="chapterModal" class="fixed inset-0 bg-primary-soft z-50 p-5 hidden flex-col overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+          <h3 id="modalBookTitle" class="text-xl font-semibold text-emerald-400">Select Chapter</h3>
+          <button onclick="closeChapterModal()" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-muted">
+            <span class="material-symbols-rounded text-sm">close</span>
+          </button>
+        </div>
+        <div id="chaptersGrid" class="">
+          </div>
+        <!-- <div id="chaptersGrid" class="grid grid-cols-5 gap-3 overflow-y-auto pr-1">
+          </div> -->
+      </div>
+    </div>
+
+    <div id="savedView" class="h-full overflow-y-auto no-scrollbar p-5 hidden pb-32">
+      <h2 class="text-lg font-medium text-primary mb-4 flex items-center gap-2">
+        <span class="material-symbols-rounded text-amber-400">auto_stories</span> Your Highlights
+      </h2>
+      <div id="savedContainer" class="flex flex-col gap-4">
+        </div>
+    </div>
+
+    <div id="settingsView" class="fixed inset-0 z-50 hidden bg-black/40 backdrop-blur-sm">
+      <div class="absolute inset-0 bg-primary/95 p-5 overflow-y-auto no-scrollbar">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <p class="text-sm uppercase tracking-widest text-muted">Settings</p>
+            <h2 class="text-xl font-semibold text-primary">App preferences</h2>
+          </div>
+          <button onclick="closeSettingsPage()" class="w-10 h-10 rounded-full bg-primary border border-theme flex items-center justify-center text-muted hover:text-emerald-400 transition-colors">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </div>
+
+        <div class="space-y-5">
+          <section class="bg-primary p-4 rounded-3xl border border-theme">
+            <h3 class="text-sm font-semibold text-primary mb-2">Translation</h3>
+            <select id="translationSelect" class="w-full bg-primary border border-theme rounded-full px-4 py-3 text-sm text-primary focus:outline-none focus:border-emerald-500">
+            </select>
+          </section>
+
+          <section class="bg-primary p-4 rounded-3xl border border-theme">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h3 class="text-sm font-semibold text-primary">Theme</h3>
+                <p class="text-[11px] text-muted">Choose light or dark mode.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="setThemeMode('light')" id="themeLightBtn" class="px-3 py-2 rounded-full border border-theme text-xs">Light</button>
+                <button onclick="setThemeMode('dark')" id="themeDarkBtn" class="px-3 py-2 rounded-full border border-theme text-xs">Dark</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="bg-primary p-4 rounded-3xl border border-theme">
+            <h3 class="text-sm font-semibold text-primary mb-2">Default highlight color</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <button onclick="setDefaultHighlightColor('bg-yellow-500/20')" id="highlightYellow" class="w-full py-3 rounded-2xl bg-yellow-400 text-xs font-semibold text-primary">Yellow</button>
+              <button onclick="setDefaultHighlightColor('bg-sky-500/20')" id="highlightSky" class="w-full py-3 rounded-2xl bg-sky-400 text-xs font-semibold text-primary">Sky</button>
+              <button onclick="setDefaultHighlightColor('bg-emerald-500/20')" id="highlightEmerald" class="w-full py-3 rounded-2xl bg-emerald-400 text-xs font-semibold text-primary">Emerald</button>
+              <button onclick="setDefaultHighlightColor('bg-purple-500/20')" id="highlightPurple" class="w-full py-3 rounded-2xl bg-purple-400 text-xs font-semibold text-primary">Purple</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="deepDiveDrawer" class="fixed inset-x-0 bottom-0 bg-primary border-t border-theme rounded-t-3xl shadow-2xl z-50 transform translate-y-full transition-transform duration-300 max-w-md mx-auto flex flex-col max-h-[85vh]">
+    <div class="w-full flex justify-center py-3 cursor-pointer" onclick="toggleDrawer(false)">
+      <div class="w-12 h-1 bg-primary-strong rounded-full"></div>
+    </div>
+    
+    <div class="flex border-b border-theme px-4 text-sm font-medium">
+      <button onclick="switchDrawerTab('original')" id="dtab-original" class="flex-1 pb-3 text-center text-emerald-400 border-b-2 border-emerald-400 font-semibold">Original Language</button>
+      <button onclick="switchDrawerTab('context')" id="dtab-context" class="flex-1 pb-3 text-center text-muted border-b-2 border-transparent">Historical Context</button>
+    </div>
+
+    <div class="p-5 overflow-y-auto no-scrollbar flex-1 text-muted text-sm leading-relaxed">
+      <div id="drawerContentOriginal" class="flex flex-col gap-4">
+        </div>
+      <div id="drawerContentContext" class="hidden flex-col gap-3">
+        </div>
+    </div>
+  </div>
+
+  <div id="drawerOverlay" onclick="toggleDrawer(false)" class="fixed inset-0 bg-black/60 z-40 hidden backdrop-blur-xs"></div>
+
+  <div id="saveSheet" class="fixed bottom-4 inset-x-4 bg-primary border border-theme p-4 rounded-2xl shadow-xl z-50 max-w-sm mx-auto transform translate-y-32 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="flex items-center justify-between">
+      <p class="text-xs font-medium text-muted">Save passage to Album</p>
+      <button onclick="closeSaveSheet()" class="text-xs text-muted underline">Dismiss</button>
+    </div>
+    <div class="flex gap-2 mt-2 overflow-x-auto no-scrollbar py-1">
+      <span class="px-3 py-1 bg-emerald-950 text-emerald-400 text-xs rounded-full border border-emerald-900 font-medium whitespace-nowrap cursor-pointer">Leadership</span>
+      <span class="px-3 py-1 bg-indigo-950 text-indigo-400 text-xs rounded-full border border-indigo-900 font-medium whitespace-nowrap cursor-pointer">Inner Peace</span>
+      <span class="px-3 py-1 bg-amber-950 text-amber-400 text-xs rounded-full border border-amber-900 font-medium whitespace-nowrap cursor-pointer">Wisdom</span>
+    </div>
+  </div>
+
+  <script src="vendor/strongs/greek/strongs-greek-dictionary.js"></script>
+  <script src="vendor/strongs/hebrew/strongs-hebrew-dictionary.js"></script>
+  <script src="vendor/strongs/strongs-lookup-index.js"></script>
+
+  <script>
+    // System Core App State Configuration
+    const state = {
+      currentTranslation: 'kjv',
+      currentBook: 'JOHN',
+      currentChapter: 1,
+      themeMode: 'light',
+      defaultHighlightColor: 'bg-yellow-500/20',
+      activeView: 'trending',
+      drawerActiveTab: 'original',
+      savedHighlights: [],
+      savedNotes: {},
+      availableTranslations: [],
+      lastTap: 0,
+      trendingCache: []
+    };
+
+    // Global Constants for books schema
+    const BIBLE_BOOKS = [
+      { id: "GEN", name: "Genesis", chapters: 50 }, { id: "EXO", name: "Exodus", chapters: 40 },
+      { id: "LEV", name: "Leviticus", chapters: 27 }, { id: "NUM", name: "Numbers", chapters: 36 },
+      { id: "DEU", name: "Deuteronomy", chapters: 34 }, { id: "JOSH", name: "Joshua", chapters: 24 },
+      { id: "JUDG", name: "Judges", chapters: 21 }, { id: "RUTH", name: "Ruth", chapters: 4 },
+      { id: "1SAM", name: "1 Samuel", chapters: 31 }, { id: "2SAM", name: "2 Samuel", chapters: 24 },
+      { id: "1KNG", name: "1 Kings", chapters: 22 }, { id: "2KNG", name: "2 Kings", chapters: 25 },
+      { id: "1CHR", name: "1 Chronicles", chapters: 29 }, { id: "2CHR", name: "2 Chronicles", chapters: 36 },
+      { id: "EZRA", name: "Ezra", chapters: 10 }, { id: "NEH", name: "Nehemiah", chapters: 13 },
+      { id: "EST", name: "Esther", chapters: 10 }, { id: "JOB", name: "Job", chapters: 42 },
+      { id: "PSA", name: "Psalms", chapters: 150 }, { id: "PRO", name: "Proverbs", chapters: 31 },
+      { id: "ECC", name: "Ecclesiastes", chapters: 12 }, { id: "SNG", name: "Song of Solomon", chapters: 8 },
+      { id: "ISA", name: "Isaiah", chapters: 66 }, { id: "JER", name: "Jeremiah", chapters: 52 },
+      { id: "LAM", name: "Lamentations", chapters: 5 }, { id: "EZK", name: "Ezekiel", chapters: 48 },
+      { id: "DAN", name: "Daniel", chapters: 12 }, { id: "HOS", name: "Hosea", chapters: 14 },
+      { id: "JOEL", name: "Joel", chapters: 3 }, { id: "AMOS", name: "Amos", chapters: 9 },
+      { id: "OBAD", name: "Obadiah", chapters: 1 }, { id: "JON", name: "Jonah", chapters: 4 },
+      { id: "MIC", name: "Micah", chapters: 7 }, { id: "NAH", name: "Nahum", chapters: 3 },
+      { id: "HAB", name: "Habakkuk", chapters: 3 }, { id: "ZEP", name: "Zephaniah", chapters: 3 },
+      { id: "HAG", name: "Haggai", chapters: 2 }, { id: "ZEC", name: "Zechariah", chapters: 14 },
+      { id: "MAL", name: "Malachi", chapters: 4 }, { id: "MAT", name: "Matthew", chapters: 28 },
+      { id: "MARK", name: "Mark", chapters: 16 }, { id: "LUKE", name: "Luke", chapters: 24 },
+      { id: "JOHN", name: "John", chapters: 21 }, { id: "ACTS", name: "Acts", chapters: 28 },
+      { id: "ROM", name: "Romans", chapters: 16 }, { id: "1COR", name: "1 Corinthians", chapters: 16 },
+      { id: "2COR", name: "2 Corinthians", chapters: 13 }, { id: "GAL", name: "Galatians", chapters: 6 },
+      { id: "EPH", name: "Ephesians", chapters: 6 }, { id: "PHP", name: "Philippians", chapters: 4 },
+      { id: "COL", name: "Colossians", chapters: 4 }, { id: "1THS", name: "1 Thessalonians", chapters: 5 },
+      { id: "2THS", name: "2 Thessalonians", chapters: 3 }, { id: "1TIM", name: "1 Timothy", chapters: 6 },
+      { id: "2TIM", name: "2 Timothy", chapters: 4 }, { id: "TIT", name: "Titus", chapters: 3 },
+      { id: "PHM", name: "Philemon", chapters: 1 }, { id: "HEB", name: "Hebrews", chapters: 13 },
+      { id: "JAS", name: "James", chapters: 5 }, { id: "1PET", name: "1 Peter", chapters: 5 },
+      { id: "2PET", name: "2 Peter", chapters: 3 }, { id: "1JHN", name: "1 John", chapters: 5 },
+      { id: "2JHN", name: "2 John", chapters: 1 }, { id: "3JHN", name: "3 John", chapters: 1 },
+      { id: "JUDE", name: "Jude", chapters: 1 }, { id: "REV", name: "Revelation", chapters: 22 }
+    ];
+
+    const ORIGINAL_LANGUAGE_CACHE = {};
+    const OT_BOOK_IDS = new Set([
+      'GEN','EXO','LEV','NUM','DEU','JOSH','JUDG','RUTH','1SAM','2SAM','1KNG','2KNG',
+      '1CHR','2CHR','EZRA','NEH','EST','JOB','PSA','PRO','ECC','SNG','ISA','JER','LAM','EZK',
+      'DAN','HOS','JOEL','AMOS','OBAD','JON','MIC','NAH','HAB','ZEP','HAG','ZEC','MAL',
+      'GENESIS','EXODUS','LEVITICUS','NUMBERS','DEUTERONOMY','JOSHUA','JUDGES','RUTH','1 SAMUEL','2 SAMUEL','1 KINGS','2 KINGS',
+      '1 CHRONICLES','2 CHRONICLES','EZRA','NEHEMIAH','ESTHER','JOB','PSALMS','PROVERBS','ECCLESIASTES','SONG OF SOLOMON','ISAIAH','JEREMIAH','LAMENTATIONS','EZEKIEL',
+      'DANIEL','HOSEA','JOEL','AMOS','OBADIAH','JONAH','MICAH','NAHUM','HABAKKUK','ZEPHANIAH','HAGGAI','ZECHARIAH','MALACHI'
+    ]);
+
+    const ORIGINAL_FALLBACKS = {
+      god: ['θεός', 'Theos', 'God / Divine Being'],
+      word: ['λόγος', 'Logos', 'Divine Word / Expression'],
+      spirit: ['πνεῦμα', 'Pneuma', 'Spirit / Breath'],
+      light: ['φῶς', 'Phos', 'Light / Illumination'],
+      love: ['ἀγάπη', 'Agape', 'Self-giving Love'],
+      life: ['ζωή', 'Zoe', 'Life / Vitality'],
+      faith: ['πίστις', 'Pistis', 'Faith / Trust'],
+      grace: ['χάρις', 'Charis', 'Grace / Favor'],
+      truth: ['ἀλήθεια', 'Aletheia', 'Truth / Reality'],
+      peace: ['εἰρήνη', 'Eirene', 'Peace / Wholeness'],
+      glory: ['δόξα', 'Doxa', 'Glory / Honor'],
+      kingdom: ['βασιλεία', 'Basileia', 'Kingdom / Reign'],
+      salvation: ['σωτηρία', 'Soteria', 'Salvation / Deliverance'],
+      son: ['υἱός', 'Huios', 'Son / Descendant'],
+      beloved: ['ἀγαπητός', 'Agapētos', 'Beloved / Dearly loved'],
+      sacrifice: ['θυσία', 'Thusia', 'Sacrifice / Offering'],
+      blood: ['αἷμα', 'Haima', 'Blood / Life sacrifice'],
+      jesus: ['Ἰησοῦς', 'Iesous', 'Jesus'],
+
+      christ: ['Χριστός', 'Christos', 'Anointed One / Messiah'],
+      lord: ['κύριος', 'Kyrios', 'Lord / Master'],
+      father: ['πατήρ', 'Pater', 'Father'],
+      heaven: ['οὐρανός', 'Ouranos', 'Heaven / Sky'],
+      earth: ['γῆ', 'Ge', 'Earth / Land'],
+      sin: ['ἁμαρτία', 'Hamartia', 'Sin / Missing the mark'],
+      righteousness: ['δικαιοσύνη', 'Dikaiosyne', 'Righteousness / Justice'],
+      holy: ['ἅγιος', 'Hagios', 'Holy / Set apart'],
+      power: ['δύναμις', 'Dynamis', 'Power / Ability'],
+      name: ['ὄνομα', 'Onoma', 'Name / Identity'],
+      heart: ['καρδία', 'Kardia', 'Heart / Inner self'],
+      hope: ['ἐλπίς', 'Elpis', 'Hope / Expectation'],
+      law: ['νόμος', 'Nomos', 'Law'],
+      commandment: ['ἐντολή', 'Entole', 'Commandment'],
+      wisdom: ['σοφία', 'Sophia', 'Wisdom']
+    };
+
+    const STRONGS_PREFERRED_WORDS = {
+      god: { OT: 'H430', NT: 'G2316' },
+      lord: { OT: 'H136', NT: 'G2962' },
+      word: { OT: 'H1697', NT: 'G3056' },
+      beginning: { OT: 'H7221', NT: 'G746' },
+      created: { OT: 'H1254', NT: 'G2936' },
+      heavens: { OT: 'H8064', NT: 'G3772' },
+      earth: { OT: 'H127', NT: 'G1093' },
+      spirit: { OT: 'H7307', NT: 'G4151' },
+      love: { OT: 'H157', NT: 'G25' },
+      life: { OT: 'H2416', NT: 'G2222' },
+      faith: { OT: 'H5303', NT: 'G4102' },
+      christ: { NT: 'G5547' },
+      jesus: { NT: 'G2424' },
+      holy: { OT: 'H6944', NT: 'G40' },
+      sin: { OT: 'H2398', NT: 'G266' }
+    };
+
+    function isOldTestament(bookName) {
+      return OT_BOOK_IDS.has(bookName.toUpperCase());
+    }
+
+    function getOriginalTargetLanguage(bookName) {
+      return isOldTestament(bookName) ? 'he' : 'el';
+    }
+
+    async function fetchOriginalTranslation(word, targetLang) {
+      // Remote translation services are blocked by CORS in the browser.
+      // Use local fallback values instead of attempting a network request.
+      return null;
+    }
+
+    async function fetchDictionaryDefinition(word) {
+      // External dictionary APIs are not reliable for the browser environment.
+      return null;
+    }
+
+    function containsNonLatin(text) {
+      return /[^\u0000-\u007F]/.test(text);
+    }
+
+    function getAmplifiedExplanation(word, definition) {
+      const amplified = {
+        love: 'Intense, self-giving affection and covenant loyalty',
+        light: 'Spiritual illumination, revealed truth, and clarity',
+        faith: 'Trust, reliance, and confident commitment to God',
+        grace: 'Unearned favor, mercy, and empowering kindness',
+        kingdom: 'God’s reigning authority and redemptive rule',
+        salvation: 'Deliverance, rescue, and restored wholeness',
+        peace: 'Wholeness, reconciliation, and inner well-being',
+        hope: 'Expectant trust in God’s promises and future',
+        truth: 'Revealed reality, faithfulness, and integrity',
+        spirit: 'Divine breath, presence, and life-giving power',
+        lord: 'Master, sovereign ruler, and one who deserves reverence',
+        father: 'Loving source, protector, and covenant parent',
+        holy: 'Set apart, sacred, and morally pure',
+        earth: 'Land, creation, and the human world',
+        heaven: 'The divine realm, sky, and spiritual presence',
+        glory: 'Honor, radiance, and manifested worth',
+        righteousness: 'Right relationship, justice, and faithful living',
+        mercy: 'Compassion, rescue, and undeserved kindness',
+        law: 'God’s instruction, covenant pathway, and moral order',
+        wisdom: 'Practical insight, discernment, and godly understanding'
+      };
+
+      return amplified[word] || definition || 'Failed to load definition :(';
+    }
+
+    function lookupStrongs(word, bookName) {
+      try {
+        const dict = isOldTestament(bookName) ? window.strongsHebrewDictionary : window.strongsGreekDictionary;
+        const lookupIndex = isOldTestament(bookName) ? window.strongsHebrewLookupIndex : window.strongsGreekLookupIndex;
+        if (!dict) return null;
+        const w = word.toLowerCase();
+
+        function simpleStem(t) {
+          if (t.length <= 3) return t;
+          if (t.endsWith("'s")) t = t.slice(0, -2);
+          if (t.endsWith('ies')) return t.slice(0, -3) + 'y';
+          if (t.endsWith('s') && !t.endsWith('ss')) t = t.slice(0, -1);
+          if (t.endsWith('ing')) t = t.slice(0, -3);
+          if (t.endsWith('ed')) t = t.slice(0, -2);
+          return t;
+        }
+
+        const wStem = simpleStem(w);
+        const override = STRONGS_PREFERRED_WORDS[w] || STRONGS_PREFERRED_WORDS[wStem];
+        if (override) {
+          const preferredId = isOldTestament(bookName) ? (override.OT || override.NT) : (override.NT || override.OT);
+          if (preferredId && dict[preferredId]) return { id: preferredId, entry: dict[preferredId] };
+        }
+
+        const candidates = new Map();
+        const addCandidates = (ids) => {
+          ids.slice(0, 40).forEach((id, idx) => {
+            candidates.set(id, (candidates.get(id) || 0) + (40 - idx));
+          });
+        };
+
+        if (lookupIndex) {
+          addCandidates(lookupIndex[w] || []);
+          if (wStem !== w) addCandidates(lookupIndex[wStem] || []);
+        }
+
+        if (candidates.size === 0) {
+          for (const id in dict) candidates.set(id, 1);
+        }
+
+        let best = null;
+        let bestScore = 0;
+
+        for (const [id, baseWeight] of candidates.entries()) {
+          const entry = dict[id];
+          if (!entry) continue;
+
+          const lemma = (entry.lemma || '').toLowerCase();
+          const kjvText = (entry.kjv_def || entry.kjv || '').toLowerCase();
+          const sdef = (entry.strongs_def || '').toLowerCase();
+          const kjvTokens = kjvText ? kjvText.split(/[^a-zA-Z]+/).filter(Boolean) : [];
+          const sTokens = sdef ? sdef.split(/[^a-zA-Z]+/).filter(Boolean) : [];
+
+          let score = baseWeight;
+          if (lemma && (lemma === w || lemma === wStem)) score += 120;
+          if (kjvTokens[0] === w || kjvTokens[0] === wStem) score += 50;
+          if (kjvTokens.includes(w) || kjvTokens.includes(wStem)) score += kjvTokens.length <= 3 ? 40 : 10;
+          if (sTokens.includes(w) || sTokens.includes(wStem)) score += sTokens.length <= 3 ? 30 : 5;
+          if (entry.translit || entry.xlit || entry.pron) score += 5;
+
+          if (score > bestScore) {
+            bestScore = score;
+            best = { id, entry };
+          }
+        }
+
+        if (best && bestScore >= 30) return best;
+      } catch (e) {
+        return null;
+      }
+      return null;
+    }
+
+    async function resolveOriginalWord(word, bookName) {
+      const cacheKey = `${bookName}.${word}`;
+      if (ORIGINAL_LANGUAGE_CACHE[cacheKey]) {
+        return ORIGINAL_LANGUAGE_CACHE[cacheKey];
+      }
+
+      // Try Strong's local dictionary first
+      const strongMatch = lookupStrongs(word, bookName);
+      if (strongMatch) {
+        const e = strongMatch.entry;
+        const translit = e.translit || e.xlit || e.pron || e.transliteration || '';
+        const rawDef = e.kjv_def || e.strongs_def || '';
+        // Use an amplified-style explanation for the displayed "translation" while keeping raw entry available
+        const translation = getAmplifiedExplanation(word, rawDef);
+        const result = {
+          original: e.lemma || word,
+          transliteration: translit,
+          translation: translation,
+          // keep raw entry for deeper inspection, but do not expose source label in UI
+          rawEntry: e,
+          targetLanguage: isOldTestament(bookName) ? 'Hebrew' : 'Greek'
+        };
+
+        ORIGINAL_LANGUAGE_CACHE[cacheKey] = result;
+        return result;
+      }
+
+      // Fallback: use built-in local fallback values when Strong's lookup fails.
+      const fallback = ORIGINAL_FALLBACKS[word] || [word, word, 'Amplified contextual keyword'];
+      const result = {
+        original: fallback[0],
+        transliteration: fallback[1] || word,
+        translation: getAmplifiedExplanation(word, fallback[2]),
+        targetLanguage: isOldTestament(bookName) ? 'Hebrew' : 'Greek'
+      };
+
+      ORIGINAL_LANGUAGE_CACHE[cacheKey] = result;
+      return result;
+    }
+
+    function buildVerseBackgroundContext(book, chapter, verse, lowerText) {
+      const themes = [];
+      const keywordMap = {
+        love: 'Sacrificial love and covenant relationship',
+        light: 'Truth, revelation, and spiritual illumination',
+        faith: 'Dependence and trust in God',
+        grace: 'Unearned favor and redemption',
+        kingdom: 'The reign and authority of God',
+        salvation: 'Deliverance and restoration',
+        sin: 'Human failure and need for mercy',
+        peace: 'Wholeness and reconciliation',
+        hope: 'Expectation for what God promises',
+        wisdom: 'Practical insight for living well',
+        prayer: 'Conversation with God and spiritual posture',
+        mercy: 'Compassion offered to the vulnerable',
+        justice: 'Right relationship and divine fairness'
+      };
+
+      Object.keys(keywordMap).forEach(word => {
+        if (lowerText.includes(word)) {
+          themes.push(keywordMap[word]);
+        }
+      });
+
+      if (themes.length === 0) {
+        themes.push('Spiritual instruction and theological reflection');
+      }
+
+      let literaryStyle = 'Poetic or instructional biblical literature';
+      if (lowerText.includes('jesus') || lowerText.includes('christ')) {
+        literaryStyle = 'Christ-centered theological teaching';
+      } else if (lowerText.includes('said') || lowerText.includes('spoke')) {
+        literaryStyle = 'Narrative dialogue and spoken teaching';
+      }
+
+      const bookEra = isOldTestament(book) ? 'Hebrew Bible tradition' : 'Greek New Testament context';
+      const historicalInsight = `This passage comes from ${book} ${chapter}:${verse}, within the ${bookEra}. It reflects the cultural and religious backdrop of the original audience and the way early listeners would have absorbed the message.`;
+      const application = `This scripture emphasizes ${themes[0].toLowerCase()}. It invites the reader to internalize the passage and allow the ideas to shape their life, obedience, and spiritual formation.`;
+
+      return {
+        themes,
+        literaryStyle,
+        application,
+        historicalInsight,
+        bookEra
+      };
+    }
+
+    // Initialization lifecycle hook
+    window.addEventListener('DOMContentLoaded', async () => {
+      loadSavedState();
+      await fetchTranslations();
+      renderBooksGrid();
+      configureSettingsControls();
+      renderFeed();
+      switchView('trending');
+    });
+
+    // Fetch and fill top free translation configurations
+    async function fetchTranslations() {
+      const curatedTranslations = [
+        { id: 'kjv', name: 'King James Version' },
+        { id: 'web', name: 'World English Bible' },
+        { id: 'asv', name: 'American Standard Version' },
+        { id: 'bbe', name: 'Bible in Basic English' }
+      ];
+
+      state.availableTranslations = curatedTranslations;
+      if (!state.currentTranslation) state.currentTranslation = 'kjv';
+
+      const dropdown = document.getElementById('translationSelect');
+
+      dropdown.innerHTML = curatedTranslations.map(t =>
+        `<option value="${t.id}" ${t.id === state.currentTranslation ? 'selected' : ''}>${t.name}</option>`
+      ).join('');
+
+      dropdown.addEventListener('change', (e) => {
+        state.currentTranslation = e.target.value;
+        saveAppSettings();
+        renderFeed();
+      });
+    }
+
+    function configureSettingsControls() {
+      const translationDropdown = document.getElementById('translationSelect');
+      if (translationDropdown) {
+        translationDropdown.value = state.currentTranslation;
+        translationDropdown.addEventListener('change', (e) => {
+          state.currentTranslation = e.target.value;
+          saveAppSettings();
+          renderFeed();
+        });
+      }
+
+      updateSettingsActiveStates();
+    }
+
+    function openSettingsPage() {
+      const panel = document.getElementById('settingsView');
+      if (panel) {
+        panel.classList.remove('hidden');
+        updateSettingsActiveStates();
+      }
+    }
+
+    function closeSettingsPage() {
+      const panel = document.getElementById('settingsView');
+      if (panel) {
+        panel.classList.add('hidden');
+      }
+    }
+
+    function updateSettingsActiveStates() {
+      const lightBtn = document.getElementById('themeLightBtn');
+      const darkBtn = document.getElementById('themeDarkBtn');
+      const colorButtons = [
+        { id: 'highlightYellow', value: 'bg-yellow-500/20' },
+        { id: 'highlightSky', value: 'bg-sky-500/20' },
+        { id: 'highlightEmerald', value: 'bg-emerald-500/20' },
+        { id: 'highlightPurple', value: 'bg-purple-500/20' }
+      ];
+
+      if (lightBtn) {
+        lightBtn.className = `px-3 py-2 rounded-full border text-xs ${state.themeMode === 'light' ? 'bg-emerald-500/20 border-emerald-400 text-primary' : 'bg-primary border-theme text-muted'}`;
+      }
+      if (darkBtn) {
+        darkBtn.className = `px-3 py-2 rounded-full border text-xs ${state.themeMode === 'dark' ? 'bg-emerald-500/20 border-emerald-400 text-primary' : 'bg-primary border-theme text-muted'}`;
+      }
+
+      colorButtons.forEach(btn => {
+        const element = document.getElementById(btn.id);
+        if (!element) return;
+        const isSelected = state.defaultHighlightColor === btn.value;
+        element.className = `w-full py-3 rounded-2xl text-xs font-semibold ${btn.value === 'bg-yellow-500/20' ? 'bg-yellow-400' : btn.value === 'bg-sky-500/20' ? 'bg-sky-400' : btn.value === 'bg-emerald-500/20' ? 'bg-emerald-400' : 'bg-purple-400'} ${isSelected ? 'ring-2 ring-emerald-400 ring-offset-2 ring-offset-primary' : ''}`;
+      });
+    }
+
+    function setThemeMode(mode) {
+      state.themeMode = mode === 'dark' ? 'dark' : 'light';
+      document.documentElement.classList.toggle('dark', state.themeMode === 'dark');
+      saveAppSettings();
+      updateSettingsActiveStates();
+    }
+
+    function setDefaultHighlightColor(colorClass) {
+      state.defaultHighlightColor = colorClass || 'bg-yellow-500/20';
+      saveAppSettings();
+      updateSettingsActiveStates();
+    }
+
+    function saveAppSettings() {
+      const settings = {
+        currentBook: state.currentBook,
+        currentChapter: state.currentChapter,
+        currentTranslation: state.currentTranslation,
+        themeMode: state.themeMode,
+        defaultHighlightColor: state.defaultHighlightColor
+      };
+
+      localStorage.setItem('aura_bible_settings', JSON.stringify(settings));
+      localStorage.setItem('aura_bible_translation', state.currentTranslation);
+    }
+
+    // High performance API ingestion and chunking execution
+    
+async function renderFeed(customPassageData = null) {
+      const feedView = document.getElementById('feedView');
+
+      feedView.innerHTML = `
+        <div class="h-full w-full flex flex-col justify-center items-center text-muted">
+          <span class="animate-spin material-symbols-rounded text-3xl text-emerald-400 mb-2">progress_activity</span>
+          Loading Scripture...
+        </div>`;
+
+      try {
+        let cardsHTML = '';
+
+        if (customPassageData) {
+          cardsHTML = customPassageData;
+        } else {
+          const currentBookData = BIBLE_BOOKS.find(b => b.id === state.currentBook);
+
+          if (!currentBookData) {
+            throw new Error('Book not found');
+          }
+
+          const bookName = currentBookData.name;
+          const chapterNum = state.currentChapter;
+
+          // Bible API endpoint
+          const query = encodeURIComponent(`${bookName} ${chapterNum}`);
+          let url = `https://bible-api.com/${query}`;
+
+          // Only append translation if supported
+          const supportedTranslations = ['kjv', 'web', 'asv', 'bbe'];
+
+          if (supportedTranslations.includes(state.currentTranslation)) {
+            url += `?translation=${state.currentTranslation}`;
+          }
+
+          const res = await fetch(url);
+
+          if (!res.ok) {
+            throw new Error('API request failed');
+          }
+
+          const data = await res.json();
+
+          if (!data.verses || data.verses.length === 0) {
+            throw new Error('No verses returned');
+          }
+
+          const totalVerses = data.verses.map(v => ({
+            number: v.verse,
+            text: v.text.trim()
+          }));
+
+          const chunkSize = 3;
+
+          for (let i = 0; i < totalVerses.length; i += chunkSize) {
+            const verseSlice = totalVerses.slice(i, i + chunkSize);
+            cardsHTML += compileCardMarkup(verseSlice, bookName, chapterNum);
+          }
+
+          const hasNextChapter = currentBookData && state.currentChapter < currentBookData.chapters;
+          if (hasNextChapter) {
+            cardsHTML += renderNextChapterCard(currentBookData.name, state.currentChapter + 1);
+          }
+        }
+
+        feedView.innerHTML = cardsHTML;
+        setupCardGestures();
+        observeNextChapterCard();
+
+      } catch (err) {
+        console.error(err);
+
+        feedView.innerHTML = `
+          <div class="h-full w-full flex flex-col justify-center items-center p-8 text-center text-muted">
+            <span class="material-symbols-rounded text-red-400 text-5xl mb-3">error</span>
+            <p class="font-semibold text-primary mb-2">Unable to load Scripture.</p>
+            <p class="text-xs text-muted mb-4 max-w-xs">
+              The Bible API may be temporarily unavailable or the selected translation may not support this passage.
+            </p>
+
+            <button onclick="resetToGenesis()"
+              class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold">
+              Load Genesis 1
+            </button>
+          </div>`;
+      }
+    }
+
+    function resetToGenesis() {
+      if (!state.currentTranslation) state.currentTranslation = 'kjv';
+      state.currentBook = 'GEN';
+      state.currentChapter = 1;
+
+      const dropdown = document.getElementById('translationSelect');
+      if (dropdown) dropdown.value = 'kjv';
+
+      renderFeed();
+    }
+
+    function renderNextChapterCard(bookName, nextChapterNum) {
+      return `
+        <div class="snap-card next-chapter-trigger w-full h-full flex-shrink-0 flex flex-col justify-center items-center p-6 relative card-surface border-b border-theme">
+          <div class="text-center z-10 max-w-sm mx-auto">
+            <p class="text-sm font-semibold text-primary mb-2">Chapter complete</p>
+            <p class="text-xs text-muted mb-6">Ready to continue with ${bookName} ${nextChapterNum}?</p>
+            <button onclick="loadNextChapter()" class="px-5 py-3 rounded-full bg-emerald-600 text-white text-sm font-semibold shadow-sm hover:bg-emerald-500 transition-colors">
+              Load ${bookName} ${nextChapterNum}
+            </button>
+          </div>
+        </div>`;
+    }
+
+    function observeNextChapterCard() {
+      const feedView = document.getElementById('feedView');
+      const nextCard = feedView.querySelector('.next-chapter-trigger');
+      const confettiContainer = document.getElementById('confettiContainer');
+      if (!nextCard || !confettiContainer || !window.IntersectionObserver) return;
+
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting || entry.target.dataset.confettiFired) return;
+          entry.target.dataset.confettiFired = 'true';
+          setTimeout(() => triggerConfettiBurst(confettiContainer, entry.target), 400);
+          obs.unobserve(entry.target);
+        });
+      }, {
+        root: feedView,
+        threshold: 0.55,
+      });
+
+      observer.observe(nextCard);
+    }
+
+    function triggerConfettiBurst(container, sourceCard) {
+      const button = sourceCard.querySelector('button');
+      const sourceRect = button ? button.getBoundingClientRect() : sourceCard.getBoundingClientRect();
+      const startX = sourceRect.left + sourceRect.width * 0.5;
+      const startY = sourceRect.top + (sourceRect.height * 0.5);
+
+      const colors = ['#16a34a', '#059669', '#84cc16', '#22c55e', '#4ade80', '#d97706', '#f59e0b', '#ec4899'];
+      const pieces = 50;
+      const g = 0.00018;
+      const duration = 2400;
+
+      for (let i = 0; i < pieces; i += 1) {
+        const piece = document.createElement('div');
+        const width = 8 + Math.random() * 14;
+        const height = 16 + Math.random() * 20;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+
+        const angle = (Math.random() * 160) * (Math.PI / 180);
+        const speed = 420 + Math.random() * 400;
+        const vx = (Math.cos(angle) * speed) / 3;
+        const vy = -Math.sin(angle) * (220 + Math.random() * 200);
+        const rotationSpeed = 1440 + Math.random() * 720;
+
+        piece.className = 'confetti-piece';
+        piece.style.width = `${width}px`;
+        piece.style.height = `${height}px`;
+        piece.style.backgroundColor = color;
+        piece.style.left = `${Math.round(startX - width / 2)}px`;
+        piece.style.top = `${Math.round(startY - (height / 2))}px`;
+
+        container.appendChild(piece);
+
+        const startTime = performance.now();
+        const initialRotation = Math.random() * 360;
+
+        function animate(currentTime) {
+          const elapsed = currentTime - startTime;
+          if (elapsed >= duration) {
+            piece.remove();
+            return;
+          }
+
+          const t = elapsed / 1000;
+          const x = startX - width / 2 + vx * t;
+          const y = startY - height / 2 + vy * t + 0.5 * g * t * t * 1000000;
+          const rotation = initialRotation + (rotationSpeed * t);
+          const opacity = Math.max(0, 1 - elapsed / duration);
+
+          piece.style.left = `${Math.round(x)}px`;
+          piece.style.top = `${Math.round(y)}px`;
+          piece.style.transform = `rotate(${rotation}deg)`;
+          piece.style.opacity = opacity;
+
+          if (elapsed < duration) {
+            requestAnimationFrame(animate);
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+    }
+
+    function loadNextChapter() {
+      const currentBookData = BIBLE_BOOKS.find(b => b.id === state.currentBook);
+      if (!currentBookData) return;
+      if (state.currentChapter >= currentBookData.chapters) return;
+
+      state.currentChapter += 1;
+      document.getElementById('readingHeaderTitle').innerText = `${currentBookData.name} ${state.currentChapter}`;
+      saveAppSettings();
+      renderFeed();
+    }
+
+    // Process array chunks into structural HTML layout
+    function compileCardMarkup(verses, bookName, chapterNum) {
+      const uniqueCardId = `${bookName.replace(/\s+/g, '')}-${chapterNum}-${verses[0].number}`;
+      
+      // Calculate references
+      const startVerse = verses[0].number;
+      const endVerse = verses[verses.length - 1].number;
+      const refString = `${bookName} ${chapterNum}:${startVerse}${startVerse !== endVerse ? `-${endVerse}` : ''}`;
+
+      const cardMatch = state.savedHighlights.find(h => h.id === uniqueCardId);
+      const highlightClass = cardMatch ? cardMatch.color : '';
+
+      let innerVersesHTML = verses.map(v => {
+        const itemKey = uniqueCardId;
+        const highlightClassForVerse = highlightClass;
+
+        // Tokenize verse text into words and punctuation, preserving spacing
+        const tokens = v.text.split(/(\s+|[.,;:!?()\[\]"“”])/g).map(tok => {
+          if (!tok || /^\s+$/.test(tok) || /^([.,;:!?()\[\]"“”])$/.test(tok)) return tok;
+
+          const wordMatch = tok.match(/\b[A-Za-z']+\b/);
+          if (wordMatch) {
+            const w = wordMatch[0];
+            // skip very short words
+            if (w.length <= 2) return `<span class="verse-word" data-word="${w}">${tok}</span>`;
+            try {
+              const strong = lookupStrongs(w, bookName);
+              if (strong) {
+                const id = strong.id;
+                const e = strong.entry || {};
+                const lemma = (e.lemma || '').replace(/"/g, '&quot;');
+                const translit = (e.translit || e.xlit || e.pron || '') .replace(/"/g, '&quot;');
+                const kjv = (e.kjv_def || e.strongs_def || '') .replace(/"/g, '&quot;');
+
+                return `<span class="verse-word has-strong" data-strong-id="${id}" data-strong-lemma="${lemma}" data-strong-translit="${translit}" data-strong-kjv="${kjv}">${tok}</span>`;
+              }
+            } catch (e) {
+              // fall through to default rendering
+            }
+
+            return `<span class="verse-word" data-word="${w}">${tok}</span>`;
+          }
+
+          return tok;
+        }).join('');
+
+        return `<span class="verse-token transition-colors duration-300 rounded ${highlightClass}" data-key="${itemKey}" data-text="${v.text.replace(/\"/g, '&quot;')}" data-book="${bookName}" data-chap="${chapterNum}" data-vnum="${v.number}"><sup class="text-[10px] font-bold text-emerald-500/80 mr-1 tracking-tight">${v.number}</sup>${tokens}</span>`;
+      }).join(' ');
+
+      return `
+        <div class="snap-card w-full h-full flex-shrink-0 flex flex-col justify-between p-6 relative card-surface border-b border-theme" data-card-id="${uniqueCardId}">
+          <div class="absolute inset-0 bg-radial from-emerald-500/5 via-transparent to-transparent pointer-events-none opacity-40"></div>
+          
+          <div class="flex justify-between items-center z-10 pt-4">
+            <span class="text-xs font-semibold tracking-wider text-muted uppercase flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ${refString}
+            </span>
+            <span class="text-[10px] bg-primary px-2 py-0.5 rounded text-muted uppercase tracking-widest">${state.currentTranslation}</span>
+          </div>
+
+          <div class="flex-1 flex flex-col justify-center my-auto z-10 max-w-sm mx-auto">
+            <p class="serif-scripture text-[21px] leading-[1.65] text-primary tracking-wide select-none">
+              ${innerVersesHTML}
+            </p>
+            <p class="text-[10px] text-muted text-center mt-6 tracking-wide italic">Tip:Double-tap to highlight</p>
+          </div>
+
+          <div class="heart-burst" id="heartBurst-${uniqueCardId}"><span class="material-symbols-rounded">favorite</span></div>
+
+          <div class="flex justify-between items-center z-10 pb-4 pt-2 border-t border-theme">
+            <div class="flex gap-4">
+              <button id="highlightBtn-${uniqueCardId}" class="highlight-toggle-button flex items-center gap-1.5 transition-colors ${cardMatch ? 'text-red-500 hover:text-red-400' : 'text-muted hover:text-emerald-400'}" onclick="toggleCardHighlight('${uniqueCardId}')">
+                <span class="material-symbols-rounded">favorite</span>
+              </button>
+              <button class="flex items-center gap-1.5 text-muted hover:text-emerald-400 transition-colors" onclick="openStudyNotes('${uniqueCardId}')">
+                <span class="material-symbols-rounded text-xl">chat_bubble</span>
+                <span class="text-xs">Notes</span>
+              </button>
+            </div>
+            
+            <div class="flex gap-3">
+              <button class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-muted hover:text-emerald-400 transition-colors" onclick="openDeepDive('${uniqueCardId}')">
+                <span class="material-symbols-rounded">dictionary</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="notes-${uniqueCardId}" class="absolute inset-x-0 bottom-16 top-16 mx-4 bg-primary-soft backdrop-blur-md border border-theme p-4 rounded-xl flex flex-col justify-between hidden z-30">
+            <div class="flex justify-between items-center border-b border-theme pb-2">
+              <span class="text-xs font-semibold text-muted">Study Notes</span>
+              <button onclick="document.getElementById('notes-${uniqueCardId}').classList.add('hidden')" class="material-symbols-rounded text-sm text-muted">close</button>
+            </div>
+            <div id="notesContent-${uniqueCardId}" class="flex-1 overflow-y-auto py-2 flex flex-col gap-2.5 text-xs no-scrollbar"></div>
+            <div class="flex gap-1.5 pt-2 border-t border-theme">
+              <input id="notesInput-${uniqueCardId}" type="text" placeholder="Add study note..." class="bg-primary border border-theme text-xs rounded-lg px-2.5 py-2 flex-1 focus:outline-none focus:border-emerald-500">
+              <button onclick="addCardNote('${uniqueCardId}')" class="bg-emerald-600 text-white rounded-lg px-3 text-xs font-semibold">Post</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // Gestures engine linking full layout double-taps to actions
+    function setupCardGestures() {
+      document.querySelectorAll('.snap-card').forEach(card => {
+        card.addEventListener('touchend', function(e) {
+          // Filter button actions away from structural gestures
+          if(e.target.closest('button') || e.target.closest('input') || e.target.closest('.z-30')) return;
+          
+          const currentTime = new Date().getTime();
+          const tapLength = currentTime - state.lastTap;
+          
+          if (tapLength < 300 && tapLength > 0) {
+            handleDoubleTapHighlight(card);
+            e.preventDefault();
+          }
+          state.lastTap = currentTime;
+        });
+        
+        // Desktop Click processing optimization
+        card.addEventListener('dblclick', function(e) {
+          if(e.target.closest('button') || e.target.closest('input') || e.target.closest('.z-30')) return;
+          handleDoubleTapHighlight(card);
+        });
+      });
+    }
+
+    function handleDoubleTapHighlight(cardElement) {
+      toggleCardHighlight(cardElement.dataset.cardId);
+    }
+
+    function toggleCardHighlight(cardId) {
+      const card = document.querySelector(`[data-card-id="${cardId}"]`);
+      if (!card) return;
+
+      const tokens = Array.from(card.querySelectorAll('.verse-token'));
+      if (tokens.length === 0) return;
+
+      const existingIdx = state.savedHighlights.findIndex(h => h.id === cardId);
+      const isAlreadyHighlighted = existingIdx > -1;
+      const defaultColor = state.defaultHighlightColor || 'bg-yellow-500/20';
+
+      if (isAlreadyHighlighted) {
+        return;
+      }
+
+      const book = tokens[0].getAttribute('data-book');
+      const chap = parseInt(tokens[0].getAttribute('data-chap'));
+      const verseNums = tokens.map(t => parseInt(t.getAttribute('data-vnum'))).filter(Boolean);
+      const startVerse = Math.min(...verseNums);
+      const endVerse = Math.max(...verseNums);
+      const text = tokens.map(token => token.getAttribute('data-text')).join(' ');
+
+      state.savedHighlights.push({
+        id: cardId,
+        text,
+        book,
+        chapter: chap,
+        startVerse,
+        endVerse,
+        color: defaultColor
+      });
+
+      tokens.forEach(token => {
+        token.className = `verse-token transition-colors duration-300 rounded ${defaultColor}`;
+      });
+
+      const highlightBtn = card.querySelector('.highlight-toggle-button');
+      if (highlightBtn) {
+        highlightBtn.classList.remove('text-muted', 'hover:text-emerald-400');
+        highlightBtn.classList.add('text-red-500', 'hover:text-red-400');
+      }
+
+      triggerHeartBurst(cardId);
+      saveToLocalStorage();
+      saveAppSettings();
+      renderSavedHighlightsList();
+    }
+
+    function triggerHeartBurst(cardId) {
+      const burst = document.getElementById(`heartBurst-${cardId}`);
+      if (!burst) return;
+      burst.classList.remove('animate');
+      void burst.offsetWidth;
+      burst.classList.add('animate');
+    }
+
+    function openStudyNotes(cardId) {
+      const panel = document.getElementById(`notes-${cardId}`);
+      if (!panel) return;
+      panel.classList.toggle('hidden');
+      if (!panel.classList.contains('hidden')) {
+        renderCardNotes(cardId);
+      }
+    }
+
+    function renderCardNotes(cardId) {
+      const container = document.getElementById(`notesContent-${cardId}`);
+      const input = document.getElementById(`notesInput-${cardId}`);
+      if (!container || !input) return;
+
+      const notes = state.savedNotes[cardId] || [];
+      if (notes.length === 0) {
+        container.innerHTML = `
+          <div class="py-8 text-center text-muted text-xs">
+            <p class="font-semibold">No notes yet.</p>
+            <p class="mt-2">Add a note to save thoughts for this passage.</p>
+          </div>`;
+      } else {
+        container.innerHTML = notes.map(note => `
+          <div class="bg-primary p-3 rounded-lg border border-theme">
+            <p class="text-[11px] text-primary leading-tight mb-1">${note.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+            <p class="text-[10px] text-muted uppercase tracking-wide">Saved ${note.when}</p>
+          </div>`).join('');
+      }
+      input.value = '';
+    }
+
+    function addCardNote(cardId) {
+      const input = document.getElementById(`notesInput-${cardId}`);
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+
+      const notes = state.savedNotes[cardId] || [];
+      notes.unshift({
+        text,
+        when: new Date().toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })
+      });
+      state.savedNotes[cardId] = notes;
+
+      saveToLocalStorage();
+      renderCardNotes(cardId);
+    }
+
+    // Dynamic Deep Dive Modal engine filling original data tracking items
+    async function openDeepDive(cardId) {
+      const card = document.querySelector(`[data-card-id="${cardId}"]`);
+      const tokens = Array.from(card.querySelectorAll('.verse-token'));
+      const text = tokens.map(token => token.getAttribute('data-text')).join(' ');
+      const book = tokens[0]?.getAttribute('data-book') || '';
+      const chapter = tokens[0]?.getAttribute('data-chap') || '';
+      const verse = tokens[0]?.getAttribute('data-vnum') || '';
+
+      // Significant verse-level word analysis
+      const insignificantWords = [
+        'the','and','a','an','to','of','in','on','for','with','that','this',
+        'is','was','are','were','be','by','it','as','from','at','or','but',
+        'if','then','into','through','he','she','they','we','you','i'
+      ];
+
+      const words = text.match(/\b[A-Za-z']+\b/g) || [];
+      const significantWords = [];
+
+      words.forEach(word => {
+        const cleanWord = word.toLowerCase();
+
+        if (
+          cleanWord.length > 2 &&
+          !insignificantWords.includes(cleanWord) &&
+          !significantWords.includes(cleanWord)
+        ) {
+          significantWords.push(cleanWord);
+        }
+      });
+
+      const limitedWords = significantWords.slice(0, 16);
+      const originalWordData = await Promise.all(limitedWords.map(word => resolveOriginalWord(word, book)));
+
+      const originalHTML = limitedWords.map((word, index) => {
+        const mapping = originalWordData[index] || {};
+        const strongDef = mapping.rawEntry ? (mapping.rawEntry.kjv_def || mapping.rawEntry.strongs_def || '') : '';
+        const strongDefLine = strongDef ? `<p class="text-[10px] text-muted mt-1 italic">${strongDef}</p>` : '';
+
+        return `
+          <div class="bg-primary p-3 rounded-xl border border-theme">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex-1">
+                <p class="text-sm font-semibold text-primary capitalize">${word}</p>
+                <p class="text-[10px] text-muted mt-1">${mapping.translation || ''}</p>
+                ${strongDefLine}
+              </div>
+              <div class="text-right min-w-[6rem]">
+                <p class="text-sm text-emerald-400 font-serif font-semibold">${mapping.original || ''}</p>
+                <p class="text-[10px] text-muted italic mt-1">${mapping.transliteration || ''}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const targetLanguageLabel = isOldTestament(book) ? 'Hebrew' : 'Greek';
+
+      document.getElementById('drawerContentOriginal').innerHTML = `
+        <div class="bg-primary p-3 rounded-xl border border-theme mb-2">
+          <p class="text-xs text-muted italic">Original language terms dynamically resolved for ${targetLanguageLabel}. Scroll for more keywords.</p>
+        </div>
+        <div class="max-h-[40vh] overflow-y-auto space-y-3 pr-1">
+          ${originalHTML}
+        </div>
+      `;
+
+
+      const lowerText = text.toLowerCase();
+      const context = buildVerseBackgroundContext(book, chapter, verse, lowerText);
+
+      document.getElementById('drawerContentContext').innerHTML = `
+        <div class="flex flex-col gap-3">
+
+          <div class="bg-primary p-3 rounded-xl border border-theme">
+            <h4 class="text-xs font-semibold text-emerald-400 mb-2">Core Themes</h4>
+
+            <div class="flex flex-col gap-2">
+              ${context.themes.map(theme => `
+                <div class="bg-primary border border-theme rounded-lg px-3 py-2">
+                  <p class="text-xs text-muted">${theme}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="bg-primary p-3 rounded-xl border border-theme">
+            <h4 class="text-xs font-semibold text-indigo-400 mb-1">Literary Context</h4>
+
+            <p class="text-xs leading-relaxed text-muted">
+              ${context.literaryStyle}
+            </p>
+          </div>
+
+          <div class="bg-primary p-3 rounded-xl border border-theme">
+            <h4 class="text-xs font-semibold text-amber-400 mb-1">Spiritual Reflection</h4>
+
+            <p class="text-xs leading-relaxed text-muted">
+              ${context.application}
+            </p>
+          </div>
+
+          <div class="bg-primary p-3 rounded-xl border border-theme">
+            <h4 class="text-xs font-semibold text-cyan-400 mb-1">Historical Insight</h4>
+
+            <p class="text-xs leading-relaxed text-muted">
+              ${context.historicalInsight}
+            </p>
+          </div>
+
+        </div>
+      `;
+
+      toggleDrawer(true);
+    }
+
+    function toggleDrawer(open) {
+      const drawer = document.getElementById('deepDiveDrawer');
+      const overlay = document.getElementById('drawerOverlay');
+      if (open) {
+        drawer.classList.remove('translate-y-full');
+        overlay.classList.remove('hidden');
+      } else {
+        drawer.classList.add('translate-y-full');
+        overlay.classList.add('hidden');
+      }
+    }
+
+    function switchDrawerTab(tab) {
+      state.drawerActiveTab = tab;
+      const dOrig = document.getElementById('drawerContentOriginal');
+      const dCont = document.getElementById('drawerContentContext');
+      const tOrig = document.getElementById('dtab-original');
+      const tCont = document.getElementById('dtab-context');
+
+      if(tab === 'original') {
+        dOrig.classList.remove('hidden');
+        dCont.classList.add('hidden');
+        tOrig.className = "flex-1 pb-3 text-center text-emerald-400 border-b-2 border-emerald-400 font-semibold";
+        tCont.className = "flex-1 pb-3 text-center text-muted border-b-2 border-transparent";
+      } else {
+        dOrig.classList.add('hidden');
+        dCont.classList.remove('hidden');
+        tOrig.className = "flex-1 pb-3 text-center text-muted border-b-2 border-transparent";
+        tCont.className = "flex-1 pb-3 text-center text-emerald-400 border-b-2 border-emerald-400 font-semibold";
+      }
+    }
+
+    // Dynamic Save Album trigger sheet
+    function triggerSaveSheet(cardId) {
+      const sheet = document.getElementById('saveSheet');
+      sheet.classList.remove('translate-y-32', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => closeSaveSheet(), 4000);
+    }
+
+    function closeSaveSheet() {
+      const sheet = document.getElementById('saveSheet');
+      sheet.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
+    }
+
+    // Global App Navigation and Router engine
+    function switchView(viewTarget) {
+      state.activeView = viewTarget;
+
+      document.getElementById('readingHeader').classList.add('hidden');
+      
+      // Reset layout visibilities
+      document.getElementById('feedView').style.display = 'none';
+      document.getElementById('browseView').style.display = 'none';
+      document.getElementById('savedView').style.display = 'none';
+      
+      // Clean tab selection highlighting CSS states
+      ['trending', 'browse', 'saved'].forEach(v => {
+        const tabEl = document.getElementById(`tab-${v}`);
+        tabEl.className = "flex-1 py-2 text-center rounded-lg text-muted transition-all";
+      });
+
+      // Activate chosen view matrix tracking layout updates
+      const activeTabElement = document.getElementById(`tab-${viewTarget}`);
+      activeTabElement.className = "flex-1 py-2 text-center rounded-lg text-emerald-400 bg-primary-strong font-semibold shadow-sm transition-all";
+
+      if (viewTarget === 'trending') {
+        document.getElementById('feedView').style.display = 'flex';
+        renderTrendingAlgorithmicShuffle();
+      } else if (viewTarget === 'browse') {
+        document.getElementById('browseView').style.display = 'block';
+      } else if (viewTarget === 'saved') {
+        document.getElementById('savedView').style.display = 'block';
+        renderSavedHighlightsList();
+      }
+    }
+
+    
+function returnToBrowse() {
+      document.getElementById('readingHeader').classList.add('hidden');
+
+      document.getElementById('feedView').style.display = 'none';
+      document.getElementById('browseView').style.display = 'block';
+      document.getElementById('savedView').style.display = 'none';
+
+      ['trending', 'browse', 'saved'].forEach(v => {
+        const tabEl = document.getElementById(`tab-${v}`);
+        tabEl.className = "flex-1 py-2 text-center rounded-lg text-muted transition-all";
+      });
+
+      const browseTab = document.getElementById('tab-browse');
+      browseTab.className =
+        "flex-1 py-2 text-center rounded-lg text-emerald-400 bg-primary-strong font-semibold shadow-sm transition-all";
+    }
+
+// Dynamic generation of full books data elements grid mapping layout
+
+    function renderBooksGrid() {
+      const grid = document.getElementById('booksGrid');
+
+      const oldTestament = BIBLE_BOOKS.slice(0, 39);
+      const newTestament = BIBLE_BOOKS.slice(39);
+
+      const renderSection = (title, books, color) => `
+        <div class="col-span-2 mt-2 mb-1">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-2 h-2 rounded-full ${color}"></div>
+            <h3 class="text-xs font-semibold uppercase tracking-widest text-muted">
+              ${title}
+            </h3>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5">
+            ${books.map(b => `
+              <button
+                onclick="openChapterModal('${b.id}', '${b.name}', ${b.chapters})"
+                class="p-3 bg-primary border border-theme rounded-xl text-left hover:border-emerald-500/40 transition-colors"
+              >
+                <p class="text-xs font-semibold text-primary">${b.name}</p>
+                <p class="text-[10px] text-muted">${b.chapters} Chapters</p>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      grid.innerHTML =
+        renderSection('Old Testament', oldTestament, 'bg-amber-400') +
+        renderSection('New Testament', newTestament, 'bg-emerald-400');
+    }
+
+    function openChapterModal(bookId, bookName, chaptersCount) {
+      state.currentBook = bookId;
+      document.getElementById('modalBookTitle').innerText = bookName;
+      
+      const grid = document.getElementById('chaptersGrid');
+      let chaptersHTML = '';
+      for (let c = 1; c <= chaptersCount; c++) {
+        chaptersHTML += `
+          <button onclick="selectChapterAndNavigate(${c})" class="chaptersBtn">
+            ${c}
+          </button>
+        `;
+        /* og style
+        
+        <button onclick="selectChapterAndNavigate(${c})" class="aspect-square bg-primary border border-theme rounded-lg flex items-center justify-center text-xs font-medium text-muted hover:bg-emerald-600 hover:text-white transition-colors">
+            ${c}
+          </button>
+        
+        */
+      }
+      grid.innerHTML = chaptersHTML;
+      document.getElementById('chapterModal').classList.remove('hidden');
+    }
+
+    function closeChapterModal() {
+      document.getElementById('chapterModal').classList.add('hidden');
+    }
+
+    
+function selectChapterAndNavigate(chapterNum) {
+      state.currentChapter = chapterNum;
+
+      closeChapterModal();
+
+      const currentBookData = BIBLE_BOOKS.find(b => b.id === state.currentBook);
+
+      if (currentBookData) {
+        document.getElementById('readingHeaderTitle').innerText =
+          `${currentBookData.name} ${chapterNum}`;
+      }
+
+      document.getElementById('readingHeader').classList.remove('hidden');
+
+      document.getElementById('feedView').style.display = 'flex';
+      document.getElementById('browseView').style.display = 'none';
+      document.getElementById('savedView').style.display = 'none';
+
+      renderFeed();
+      saveAppSettings();
+    }
+
+    // Algorithmic layout mock rendering a trending feed structure pipeline
+    const trendingPassages = [
+      { book: "JOHN", chapter: 3, startVerse: 16, endVerse: 16 },
+      { book: "ROM", chapter: 8, startVerse: 28, endVerse: 28 },
+      { book: "PRO", chapter: 3, startVerse: 5, endVerse: 6 },
+      { book: "PHP", chapter: 4, startVerse: 13, endVerse: 13 },
+      { book: "PSA", chapter: 23, startVerse: 1, endVerse: 1 },
+      { book: "MAT", chapter: 28, startVerse: 19, endVerse: 20 },
+      { book: "ROM", chapter: 12, startVerse: 2, endVerse: 2 },
+      { book: "PSA", chapter: 46, startVerse: 10, endVerse: 10 },
+      { book: "ISA", chapter: 41, startVerse: 10, endVerse: 10 },
+      { book: "GAL", chapter: 5, startVerse: 22, endVerse: 23 },
+      { book: "PSA", chapter: 118, startVerse: 24, endVerse: 24 },
+      { book: "MAT", chapter: 6, startVerse: 33, endVerse: 33 },
+      { book: "JER", chapter: 29, startVerse: 11, endVerse: 11 },
+      { book: "1COR", chapter: 16, startVerse: 14, endVerse: 14 },
+      { book: "ROM", chapter: 8, startVerse: 38, endVerse: 39 },
+      { book: "EPH", chapter: 2, startVerse: 8, endVerse: 9 },
+      { book: "PSA", chapter: 139, startVerse: 14, endVerse: 14 },
+      { book: "MAT", chapter: 11, startVerse: 28, endVerse: 30 },
+      { book: "1PET", chapter: 5, startVerse: 7, endVerse: 7 },
+      { book: "PSA", chapter: 27, startVerse: 1, endVerse: 1 },
+      { book: "PSA", chapter: 46, startVerse: 1, endVerse: 1 },
+      { book: "PRO", chapter: 16, startVerse: 3, endVerse: 3 },
+      { book: "JOSH", chapter: 1, startVerse: 9, endVerse: 9 },
+      { book: "ROM", chapter: 5, startVerse: 8, endVerse: 8 },
+      { book: "MAT", chapter: 5, startVerse: 16, endVerse: 16 },
+      { book: "1JHN", chapter: 4, startVerse: 19, endVerse: 19 },
+      { book: "PRO", chapter: 3, startVerse: 7, endVerse: 8 },
+      { book: "MAT", chapter: 22, startVerse: 37, endVerse: 39 },
+      { book: "ROM", chapter: 12, startVerse: 21, endVerse: 21 },
+      { book: "PRO", chapter: 22, startVerse: 6, endVerse: 6 },
+      { book: "PSA", chapter: 46, startVerse: 7, endVerse: 7 },
+      { book: "JAS", chapter: 1, startVerse: 5, endVerse: 5 },
+      { book: "ROM", chapter: 12, startVerse: 12, endVerse: 12 },
+      { book: "ISA", chapter: 40, startVerse: 31, endVerse: 31 },
+      { book: "COL", chapter: 3, startVerse: 23, endVerse: 23 },
+      { book: "PSA", chapter: 37, startVerse: 4, endVerse: 4 },
+      { book: "PSA", chapter: 119, startVerse: 105, endVerse: 105 },
+      { book: "MAT", chapter: 6, startVerse: 19, endVerse: 21 },
+      { book: "ISA", chapter: 43, startVerse: 2, endVerse: 2 },
+      { book: "ROM", chapter: 8, startVerse: 31, endVerse: 31 },
+      { book: "PSA", chapter: 121, startVerse: 1, endVerse: 2 },
+      { book: "MAT", chapter: 16, startVerse: 26, endVerse: 26 },
+      { book: "PRO", chapter: 3, startVerse: 9, endVerse: 10 },
+      { book: "PSA", chapter: 34, startVerse: 8, endVerse: 8 },
+      { book: "ROM", chapter: 8, startVerse: 1, endVerse: 1 },
+      { book: "PRO", chapter: 19, startVerse: 21, endVerse: 21 },
+      { book: "JOHN", chapter: 14, startVerse: 6, endVerse: 6 },
+      { book: "PRO", chapter: 18, startVerse: 10, endVerse: 10 },
+      { book: "ROM", chapter: 12, startVerse: 1, endVerse: 1 },
+      { book: "PSA", chapter: 51, startVerse: 10, endVerse: 10 },
+      { book: "1COR", chapter: 15, startVerse: 58, endVerse: 58 },
+      { book: "PSA", chapter: 121, startVerse: 7, endVerse: 8 },
+      { book: "MAT", chapter: 7, startVerse: 7, endVerse: 8 },
+      { book: "1COR", chapter: 13, startVerse: 13, endVerse: 13 },
+      { book: "PSA", chapter: 139, startVerse: 23, endVerse: 24 },
+      { book: "MAT", chapter: 28, startVerse: 18, endVerse: 18 },
+      { book: "ROM", chapter: 1, startVerse: 16, endVerse: 16 },
+      { book: "PSA", chapter: 100, startVerse: 1, endVerse: 2 },
+      { book: "ROM", chapter: 8, startVerse: 18, endVerse: 18 },
+      { book: "ISA", chapter: 53, startVerse: 5, endVerse: 5 },
+      { book: "ROM", chapter: 8, startVerse: 26, endVerse: 26 },
+      { book: "PSA", chapter: 23, startVerse: 6, endVerse: 6 },
+      { book: "MAT", chapter: 5, startVerse: 44, endVerse: 44 },
+      { book: "ROM", chapter: 13, startVerse: 1, endVerse: 1 },
+      { book: "PSA", chapter: 19, startVerse: 1, endVerse: 1 },
+      { book: "EPH", chapter: 4, startVerse: 32, endVerse: 32 },
+      { book: "PSA", chapter: 119, startVerse: 11, endVerse: 11 },
+      { book: "ROM", chapter: 14, startVerse: 17, endVerse: 17 },
+      { book: "PSA", chapter: 91, startVerse: 1, endVerse: 2 },
+      { book: "MAT", chapter: 25, startVerse: 40, endVerse: 40 },
+      { book: "GAL", chapter: 6, startVerse: 9, endVerse: 9 },
+      { book: "PSA", chapter: 46, startVerse: 11, endVerse: 11 },
+      { book: "MAT", chapter: 5, startVerse: 14, endVerse: 14 },
+      { book: "ISA", chapter: 40, startVerse: 28, endVerse: 28 },
+      { book: "MARK", chapter: 12, startVerse: 30, endVerse: 30 },
+      { book: "PRO", chapter: 17, startVerse: 17, endVerse: 17 },
+      { book: "MAT", chapter: 10, startVerse: 39, endVerse: 39 },
+      { book: "PSA", chapter: 103, startVerse: 2, endVerse: 3 },
+      { book: "JOHN", chapter: 14, startVerse: 27, endVerse: 27 },
+      { book: "PSA", chapter: 25, startVerse: 4, endVerse: 5 },
+      { book: "PRO", chapter: 1, startVerse: 7, endVerse: 7 },
+      { book: "MAT", chapter: 10, startVerse: 32, endVerse: 32 },
+      { book: "PSA", chapter: 34, startVerse: 17, endVerse: 17 },
+      { book: "LUKE", chapter: 6, startVerse: 31, endVerse: 31 },
+      { book: "PRO", chapter: 14, startVerse: 29, endVerse: 29 },
+      { book: "JOHN", chapter: 11, startVerse: 25, endVerse: 26 },
+      { book: "PSA", chapter: 56, startVerse: 3, endVerse: 3 },
+      { book: "LUKE", chapter: 9, startVerse: 23, endVerse: 23 },
+      { book: "PRO", chapter: 16, startVerse: 9, endVerse: 9 },
+      { book: "JOHN", chapter: 3, startVerse: 36, endVerse: 36 },
+      { book: "JOSH", chapter: 1, startVerse: 8, endVerse: 8 },
+      { book: "LUKE", chapter: 12, startVerse: 34, endVerse: 34 },
+      { book: "PRO", chapter: 3, startVerse: 27, endVerse: 27 },
+      { book: "JOHN", chapter: 15, startVerse: 13, endVerse: 13 },
+      { book: "PSA", chapter: 25, startVerse: 5, endVerse: 5 },
+      { book: "LUKE", chapter: 18, startVerse: 27, endVerse: 27 },
+      { book: "PRO", chapter: 12, startVerse: 25, endVerse: 25 },
+      { book: "JOHN", chapter: 16, startVerse: 33, endVerse: 33 },
+      { book: "PSA", chapter: 37, startVerse: 5, endVerse: 5 },
+      { book: "LUKE", chapter: 19, startVerse: 10, endVerse: 10 }
+    ];
+
+    async function renderTrendingAlgorithmicShuffle() {
+      const feedView = document.getElementById('feedView');
+
+      feedView.innerHTML = `
+        <div class="h-full w-full flex flex-col justify-center items-center text-muted">
+          <span class="animate-spin material-symbols-rounded text-3xl text-amber-400 mb-2">
+            bolt
+          </span>
+          Assembling Trending Fabric...
+        </div>
+      `;
+
+      try {
+        // Random trending verse
+        const selected =
+          trendingPassages[
+            Math.floor(Math.random() * trendingPassages.length)
+          ];
+
+        // Build API query
+        const query = encodeURIComponent(selected.book + ' ' + selected.chapter + ':' + selected.startVerse + '-' + selected.endVerse);
+
+        let url = `https://bible-api.com/${query}`;
+
+        // Supported translations
+        const supportedTranslations = ['kjv', 'web', 'asv', 'bbe'];
+
+        if (supportedTranslations.includes(state.currentTranslation)) {
+          url += `?translation=${state.currentTranslation}`;
+        }
+
+        console.log('Fetching:', url);
+
+        const res = await fetch(url);
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        // Convert API response to your card format
+        const verses = data.verses.map(v => ({
+          number: v.verse,
+          text: v.text.trim()
+        }));
+
+        // Extract chapter number safely
+        const chapter = data.verses[0]?.chapter || 1;
+
+        let cardHTML = `
+          <div class="absolute top-14 left-1/2 transform -translate-x-1/2 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider uppercase z-30 flex items-center gap-1 shadow-lg backdrop-blur-xs">
+            <span class="material-symbols-rounded text-xs animate-pulse">
+              local_fire_department
+            </span>
+            Suggested for you
+          </div>
+        `;
+
+        cardHTML += compileCardMarkup(
+          verses,
+          data.reference.split(' ')[0],
+          chapter
+        );
+
+        feedView.innerHTML = cardHTML;
+
+        setupCardGestures();
+
+      } catch (err) {
+        console.error('Trending render failed:', err);
+
+        // Graceful fallback
+        state.currentBook = 'PSA';
+        state.currentChapter = 23;
+
+        renderFeed();
+      }
+    }
+
+    // Fill Saved Personal Highlights tracking panels
+    function renderSavedHighlightsList() {
+      const container = document.getElementById('savedContainer');
+      if (state.savedHighlights.length === 0) {
+        container.innerHTML = `
+          <div class="py-12 text-center text-muted text-xs">
+            <span class="material-symbols-rounded text-3xl opacity-20 mb-1">bookmark_border</span>
+            <p>No highlights saved yet. Double-tap a verse in your feed view to start collecting highlights.</p>
+          </div>`;
+        return;
+      }
+
+      const highlights = [...state.savedHighlights].reverse();
+      container.innerHTML = highlights.map(h => `
+        <div onclick="openSavedHighlight('${h.id}')" class="cursor-pointer p-4 bg-primary border border-theme rounded-xl relative overflow-hidden flex flex-col gap-2 hover:border-emerald-400 transition-colors">
+          <div class="absolute left-0 inset-y-0 w-1 ${((h.color || '').replace('/20', '') || 'bg-amber-400')}"></div>
+          <div class="flex justify-between items-center text-[10px] text-muted font-semibold uppercase">
+            <span>${h.book} ${h.chapter}:${h.startVerse ? `${h.startVerse}${h.endVerse && h.startVerse !== h.endVerse ? `-${h.endVerse}` : ''}` : h.verse}</span>
+            <button onclick="event.stopPropagation(); removeIndividualHighlight('${h.id}')" class="text-muted hover:text-red-400 text-xs font-normal cursor-pointer transition-colors">
+              <span class="material-symbols-rounded">delete</span>
+            </button>
+          </div>
+          <p class="serif-scripture text-sm text-primary leading-relaxed italic">"${h.text}"</p>
+        </div>
+      `).join('');
+    }
+
+    function removeIndividualHighlight(highlightId) {
+      state.savedHighlights = state.savedHighlights.filter(h => h.id !== highlightId);
+      saveToLocalStorage();
+      renderSavedHighlightsList();
+    }
+
+    function openSavedHighlight(highlightId) {
+      const highlight = state.savedHighlights.find(h => h.id === highlightId);
+      if (!highlight) return;
+
+      const bookData = BIBLE_BOOKS.find(b => b.id === highlight.book.toUpperCase() || b.name.toUpperCase() === highlight.book.toUpperCase());
+      if (bookData) {
+        state.currentBook = bookData.id;
+        state.currentChapter = highlight.chapter;
+      }
+
+      const currentBookData = BIBLE_BOOKS.find(b => b.id === state.currentBook);
+      if (currentBookData) {
+        document.getElementById('readingHeaderTitle').innerText = `${currentBookData.name} ${state.currentChapter}`;
+      }
+
+      document.getElementById('readingHeader').classList.remove('hidden');
+      document.getElementById('feedView').style.display = 'flex';
+      document.getElementById('browseView').style.display = 'none';
+      document.getElementById('savedView').style.display = 'none';
+
+      renderFeed();
+    }
+
+    // Local Storage Persistence layer mechanics
+    function saveToLocalStorage() {
+      localStorage.setItem('aura_bible_highlights', JSON.stringify(state.savedHighlights));
+      localStorage.setItem('aura_bible_notes', JSON.stringify(state.savedNotes));
+    }
+
+    function loadSavedState() {
+      const highlightsLocal = localStorage.getItem('aura_bible_highlights');
+      if (highlightsLocal) {
+        try { state.savedHighlights = JSON.parse(highlightsLocal); } catch(e) { state.savedHighlights = []; }
+      }
+
+      const notesLocal = localStorage.getItem('aura_bible_notes');
+      if (notesLocal) {
+        try { state.savedNotes = JSON.parse(notesLocal); } catch(e) { state.savedNotes = {}; }
+      }
+
+      const settings = localStorage.getItem('aura_bible_settings');
+      if (settings) {
+        try {
+          const persisted = JSON.parse(settings);
+          if (persisted.currentBook) state.currentBook = persisted.currentBook;
+          if (persisted.currentChapter) state.currentChapter = persisted.currentChapter;
+          if (persisted.themeMode) state.themeMode = persisted.themeMode;
+          if (persisted.defaultHighlightColor) state.defaultHighlightColor = persisted.defaultHighlightColor;
+          if (persisted.currentTranslation) state.currentTranslation = persisted.currentTranslation;
+        } catch(e) {}
+      }
+
+      const savedTranslation = localStorage.getItem('aura_bible_translation');
+      if (savedTranslation) {
+        state.currentTranslation = savedTranslation;
+      }
+
+      setThemeMode(state.themeMode);
+    }
+  </script>
+  <script>
+    //document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches);
+  </script>
+</body>
+</html>
