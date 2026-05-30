@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Aura Bible</title>
+  <title>REKINDLE</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,6 +36,7 @@
       color: var(--text-primary);
       background-color: var(--bg-primary);
       -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
     }
 
     .serif-scripture {
@@ -67,7 +68,12 @@
     }
 
     .card-surface {
-      background: linear-gradient(180deg, rgba(var(--bg-primary-rgb), 0.98) 0%, rgba(var(--bg-primary-rgb), 0.96) 40%, rgba(var(--bg-primary-rgb), 0.92) 100%);
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(var(--bg-primary-rgb), 0.95) 0%, rgba(var(--bg-primary-rgb), 0.92) 45%, rgba(var(--bg-primary-rgb), 0.88) 100%);
+      border: 1px solid rgba(var(--bg-primary-rgb), 0.16);
+      border-radius: 32px;
+      backdrop-filter: blur(16px);
     }
 
     /* Hide scrollbar for Cleanliness */
@@ -89,12 +95,17 @@
     .snap-card {
       scroll-snap-align: start;
       scroll-snap-stop: always;
-      min-height: calc(100vh - 12rem);
+      min-height: calc(100vh - 14rem);
       height: auto;
+      margin: 2em 0;
       box-sizing: border-box;
     }
     .snap-card > .flex-1 {
       min-height: 0;
+    }
+
+    .next-chapter-trigger {
+      border: none;
     }
 
     .confetti-container {
@@ -152,6 +163,9 @@
       text-shadow: 0 0 22px rgba(248, 113, 113, 0.5);
     }
 
+    .reading-header {
+    }
+
     @keyframes heartPop {
       0% { opacity: 0; transform: scale(0.5); }
       20% { opacity: 1; transform: scale(1.25); }
@@ -161,51 +175,333 @@
 
     .main-tabs {
       position: fixed;
-      inset: auto 0 0 0;
-      width: 100%;
-      max-width: none;
-      /* padding: 0 1rem 1rem; */
+      bottom: 1rem;
+      left: 0;
+      right: 0;
+      width: min(100%, 42rem);
+      margin: 0 auto;
       display: flex;
       justify-content: center;
       align-items: center;
-      border-radius: 28px 28px 0 0;
+      padding: 0 1rem;
+      border-radius: 999px;
       isolation: isolate;
       touch-action: none;
-      box-shadow: 0px -1px 18px rgba(0, 0, 0, 0.12);
-      background-color: transparent;
       z-index: 20;
     }
     .main-tabs > div {
       width: 100%;
-      max-width: 100%;
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
       align-items: center;
-      border-radius: 28px;
-      background-color: var(--surface-soft);
-      backdrop-filter: blur(10px) opacity(0.6);
-      padding: 0.5rem 0.5rem;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(22px) opacity(0.5);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow: 0 28px 70px rgba(15, 23, 42, 0.14);
+      padding: 0.35rem;
+    }
+    html.dark .main-tabs > div {
+      background: rgba(15, 23, 42, 0.68);
+      border-color: rgba(148, 163, 184, 0.18);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
     }
     .main-tabs button {
       border: none;
-      background-color: transparent;
-      padding: 12px;
+      background: transparent;
+      padding: 12px 0;
       cursor: pointer;
-      color: #4E5D6C;
+      color: var(--text-muted);
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
+      flex: 1;
+      min-width: 0;
+      position: relative;
+      transition: color 0.22s ease, transform 0.22s ease;
+      border-radius: 999px;
     }
     .main-tabs button span {
-      font-size: 2rem;
+      font-size: 1.95rem;
+      line-height: 1;
+    }
+    .main-tabs button.active {
+      color: rgb(16, 185, 129);
+      transform: translateY(-1px);
+    }
+    .main-tabs > div {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(22px);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow: 0 28px 70px rgba(15, 23, 42, 0.14);
+      padding: 0.35rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .main-tabs > div::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 20%, rgba(255,255,255,0.25), transparent 32%);
+      opacity: 0.44;
+      mix-blend-mode: screen;
+      z-index: 0;
+    }
+    .main-tabs button {
+      border: none;
+      background: transparent;
+      padding: 12px 0;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      min-width: 0;
+      position: relative;
+      transition: color 0.22s ease, transform 0.22s ease;
+      border-radius: 999px;
+      z-index: 2;
+    }
+    .tab-bubble {
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      left: 6px;
+      width: calc((100% - 12px) / 3);
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.14);
+      backdrop-filter: blur(18px);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), width 0.28s ease;
+      z-index: 1;
+      pointer-events: none;
+    }
+    html.dark .tab-bubble {
+      background: rgba(16, 185, 129, 0.18);
+    }
+
+    #settingsView {
+      background: rgba(15, 23, 42, 0.34);
+      backdrop-filter: blur(14px);
+      overflow-y: auto;
+    }
+    .settingsModal {
+      position: relative;
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.25rem 1rem;
+    }
+    .settingsCard {
+      width: min(100%, 46rem);
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 36px;
+      box-shadow: 0 34px 80px rgba(15, 23, 42, 0.16);
+      backdrop-filter: blur(20px);
+      padding: 1.75rem;
+      overflow: hidden;
+    }
+    html.dark .settingsCard {
+      background: rgba(12, 16, 20, 0.92);
+      border-color: rgba(148, 163, 184, 0.16);
+      box-shadow: 0 34px 80px rgba(0, 0, 0, 0.28);
+    }
+    .settingsCardHeader {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    .settingsCardHeader h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      line-height: 1.05;
+    }
+    .settingsCardHeader p {
+      margin: 0.35rem 0 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-width: 38rem;
+    }
+    .settingsSection {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 28px;
+      padding: 1.4rem;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+    }
+    html.dark .settingsSection {
+      background: rgba(15, 23, 42, 0.68);
+      border-color: rgba(148, 163, 184, 0.12);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    }
+    .settingsSection h3 {
+      margin-bottom: 0.75rem;
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+    .settingsSection p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.94rem;
+      line-height: 1.65;
+    }
+    .settingsSelect {
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      background: rgba(255,255,255,0.93);
+      padding: 1rem 1.1rem;
+      color: var(--text-primary);
+      outline: none;
+      box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.06);
+      appearance: none;
+    }
+    html.dark .settingsSelect {
+      background: rgba(15, 23, 42, 0.82);
+      border-color: rgba(148, 163, 184, 0.16);
+      color: var(--text-primary);
+    }
+    .settingsButtonGroup {
+      display: inline-flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+    .settingsButtonGroup button {
+      border-radius: 999px;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      background: rgba(255,255,255,0.88);
+      color: var(--text-primary);
+      padding: 0.85rem 1.15rem;
+      min-width: 5rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+    }
+    html.dark .settingsButtonGroup button {
+      border-color: rgba(148, 163, 184, 0.16);
+      background: rgba(15, 23, 42, 0.8);
+    }
+    .settingsButtonGroup button:hover {
+      transform: translateY(-1px);
+    }
+    .settingsButtonGroup button.active {
+      background: rgba(16, 185, 129, 0.14);
+      color: rgb(16, 185, 129);
+      border-color: rgba(16, 185, 129, 0.35);
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.08);
+    }
+    .settingsColorGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+      margin-top: 0.75rem;
+    }
+    .settingsColorGrid button {
+      padding: 1rem;
+      border-radius: 24px;
+      border: 1px solid transparent;
+      font-size: 0.85rem;
+      font-weight: 700;
+      box-shadow: 0 18px 38px rgba(15, 23, 42, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    html.dark .settingsColorGrid button {
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.16);
+    }
+    .settingsColorGrid button:hover {
+      transform: translateY(-1px);
+    }
+    .settingsColorGrid button.selected {
+      border-color: rgba(16, 185, 129, 0.35);
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.08);
+    }
+    .settingsFooter {
+      margin-top: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      line-height: 1.75;
+    }
+
+    .notesDrawer {
+      position: fixed;
+      left: 50%;
+      bottom: 1rem;
+      transform: translate(-50%, 120%);
+      opacity: 0;
+      z-index: 50;
+      width: min(100%, 42rem);
+      max-height: min(86vh, 34rem);
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 32px;
+      box-shadow: 0 32px 90px rgba(15, 23, 42, 0.18);
+      backdrop-filter: blur(22px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
+      pointer-events: none;
+    }
+    .notesDrawer.open {
+      transform: translate(-50%, 0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .notesDrawer.closed {
+      transform: translate(-50%, 120%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    #notesOverlay.hidden {
+      display: none !important;
+    }
+    html.dark .notesDrawer {
+      background: rgba(12, 16, 20, 0.92);
+      border-color: rgba(148, 163, 184, 0.14);
+      box-shadow: 0 32px 90px rgba(0, 0, 0, 0.28);
+    }
+    .notesDrawer .notesContent {
+      min-height: 0;
+      max-height: calc(100% - 13rem);
+      overflow-y: auto;
+      padding-right: 0.15rem;
+    }
+    .notesDrawer .notesInput {
+      background: rgba(255, 255, 255, 0.94);
+      border-color: rgba(15, 23, 42, 0.12);
+    }
+    html.dark .notesDrawer .notesInput {
+      background: rgba(15, 23, 42, 0.82);
+      border-color: rgba(148, 163, 184, 0.16);
+    }
+    .btnPrimary {
+      background: rgb(16, 185, 129);
+      color: white;
+      border: 1px solid transparent;
+    }
+    .btnPrimary:hover {
+      background: rgb(20, 184, 166);
     }
 
     #chaptersGrid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-      gap: 12px;
+      display: flex;
+      flex-wrap: wrap;
       overflow-y: auto;
     }
     #chaptersGrid button {
@@ -213,6 +509,8 @@
       background-color: var(--bg-primary);
       border: 1px solid var(--border-theme);
       border-radius: 12px;
+      width: 65px;
+      height: 65px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -220,16 +518,17 @@
       font-weight: 500;
       color: var(--text-muted);
       transition: background-color 0.2s ease, color 0.2s ease;
+      margin: 6px;
     }
   </style>
 </head>
 <body class="h-full flex flex-col justify-between overflow-hidden select-none bg-primary text-primary">
 
-  <header class="w-full bg-primary-strong backdrop-blur-md border-b border-theme z-40 px-4 pt-3 pb-2 shrink-0">
+  <header class="w-full bg-primary-strong backdrop-blur-xl border-b border-theme/70 shadow-sm z-40 px-4 pt-4 pb-3 shrink-0">
     <div class="max-w-md mx-auto flex flex-col gap-3">
       <div class="flex justify-between items-center">
         <h1 class="text-xl font-semibold tracking-tight text-emerald-400 flex items-center gap-1.5">
-          <span class="material-symbols-rounded text-emerald-400">auto_awesome</span> BIBLE
+          <span class="material-symbols-rounded text-emerald-400">auto_awesome</span> REKINDLE
         </h1>
         <div class="flex items-center gap-3">
           <button onclick="openSettingsPage()" class="w-9 h-9 rounded-full bg-primary border border-theme flex items-center justify-center text-muted hover:text-emerald-400 transition-colors">
@@ -243,12 +542,11 @@
 </header>
 
 <nav class="main-tabs">
-<!-- <nav class="fixed bottom-0 inset-x-0 z-50 bg-primary-soft backdrop-blur-md border-t border-theme px-4 py-2 max-w-md mx-auto"> -->
-  <div class="flex bg-primary p-1 rounded-2xl text-xs font-medium">
-    <!-- <button onclick="switchView('trending')" id="tab-trending" class="flex-1 py-2.5 text-center rounded-xl text-muted transition-all">🔥 Trending</button> -->
-    <button onclick="switchView('trending')" id="tab-trending" class=""><span class="material-symbols-rounded">home</span></button>
-    <button onclick="switchView('browse')" id="tab-browse" class=""><span class="material-symbols-rounded">book_2</span></button>
-    <button onclick="switchView('saved')" id="tab-saved" class=""><span class="material-symbols-rounded">bookmark</span></button>
+  <div class="flex text-xs font-medium">
+    <div class="tab-bubble" id="tabBubble"></div>
+    <button onclick="switchView('trending')" id="tab-trending" class="tab-button"><span class="material-symbols-rounded">home</span></button>
+    <button onclick="switchView('browse')" id="tab-browse" class="tab-button"><span class="material-symbols-rounded">book_2</span></button>
+    <button onclick="switchView('saved')" id="tab-saved" class="tab-button"><span class="material-symbols-rounded">bookmark</span></button>
   </div>
 </nav>
 
@@ -256,7 +554,7 @@
   
 <main class="flex-1 max-w-md w-full mx-auto relative overflow-hidden bg-primary">
 
-    <div id="readingHeader" class="hidden absolute top-0 inset-x-0 z-30 bg-primary-soft backdrop-blur-md border-b border-theme px-4 py-3">
+    <div id="readingHeader" class="reading-header hidden absolute top-0 inset-x-0 z-30 bg-primary-soft backdrop-blur-xl border-b border-theme px-4 py-3">
       <div class="flex items-center justify-between">
         <button onclick="returnToBrowse()" class="flex items-center gap-1.5 text-muted text-sm font-medium hover:text-emerald-400 transition-colors">
           <span class="material-symbols-rounded text-base">arrow_back</span>
@@ -305,47 +603,61 @@
         </div>
     </div>
 
-    <div id="settingsView" class="fixed inset-0 z-50 hidden bg-black/40 backdrop-blur-sm">
-      <div class="absolute inset-0 bg-primary/95 p-5 overflow-y-auto no-scrollbar">
-        <div class="flex items-center justify-between mb-5">
-          <div>
-            <p class="text-sm uppercase tracking-widest text-muted">Settings</p>
-            <h2 class="text-xl font-semibold text-primary">App preferences</h2>
+    <div id="settingsView" class="fixed inset-0 z-50 hidden">
+      <div class="settingsModal">
+        <div class="settingsCard">
+          <div class="settingsCardHeader">
+            <div>
+              <p class="text-sm uppercase tracking-widest text-muted">Settings</p>
+              <h2 class="text-2xl font-semibold text-primary">App preferences</h2>
+              <p>Customize your reading experience, translation, and highlight style in one place.</p>
+            </div>
+            <button onclick="closeSettingsPage()" class="w-11 h-11 rounded-full bg-primary border border-theme flex items-center justify-center text-muted hover:text-emerald-400 transition-colors" style="aspect-ratio: 1 / 1;">
+              <span class="material-symbols-rounded">close</span>
+            </button>
           </div>
-          <button onclick="closeSettingsPage()" class="w-10 h-10 rounded-full bg-primary border border-theme flex items-center justify-center text-muted hover:text-emerald-400 transition-colors">
-            <span class="material-symbols-rounded">close</span>
-          </button>
-        </div>
 
-        <div class="space-y-5">
-          <section class="bg-primary p-4 rounded-3xl border border-theme">
-            <h3 class="text-sm font-semibold text-primary mb-2">Translation</h3>
-            <select id="translationSelect" class="w-full bg-primary border border-theme rounded-full px-4 py-3 text-sm text-primary focus:outline-none focus:border-emerald-500">
-            </select>
-          </section>
+          <div class="space-y-5">
+            <section class="settingsSection">
+              <h3>Translation</h3>
+              <p>Select the Bible translation you prefer for scripture passages.</p>
+              <div class="mt-4">
+                <label class="settingsLabel" for="translationSelect">Preferred translation</label>
+                <select id="translationSelect" class="settingsSelect">
+                </select>
+              </div>
+            </section>
 
-          <section class="bg-primary p-4 rounded-3xl border border-theme">
-            <div class="flex items-center justify-between mb-3">
+            <section class="settingsSection">
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <h3>Theme</h3>
+                  <p>Switch between light and dark mode for comfortable reading.</p>
+                </div>
+                <div class="settingsButtonGroup">
+                  <button onclick="setThemeMode('light')" id="themeLightBtn" class="text-xs">Light</button>
+                  <button onclick="setThemeMode('dark')" id="themeDarkBtn" class="text-xs">Dark</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="settingsSection">
               <div>
-                <h3 class="text-sm font-semibold text-primary">Theme</h3>
-                <p class="text-[11px] text-muted">Choose light or dark mode.</p>
+                <h3>Default highlight color</h3>
+                <p>Choose the accent color used for your saved scripture highlights.</p>
               </div>
-              <div class="flex items-center gap-2">
-                <button onclick="setThemeMode('light')" id="themeLightBtn" class="px-3 py-2 rounded-full border border-theme text-xs">Light</button>
-                <button onclick="setThemeMode('dark')" id="themeDarkBtn" class="px-3 py-2 rounded-full border border-theme text-xs">Dark</button>
+              <div class="settingsColorGrid">
+                <button onclick="setDefaultHighlightColor('bg-yellow-500/20')" id="highlightYellow" class="text-xs font-semibold text-primary">Yellow</button>
+                <button onclick="setDefaultHighlightColor('bg-sky-500/20')" id="highlightSky" class="text-xs font-semibold text-primary">Blue</button>
+                <button onclick="setDefaultHighlightColor('bg-emerald-500/20')" id="highlightEmerald" class="text-xs font-semibold text-primary">Green</button>
+                <button onclick="setDefaultHighlightColor('bg-purple-500/20')" id="highlightPurple" class="text-xs font-semibold text-primary">Purple</button>
               </div>
-            </div>
-          </section>
+            </section>
 
-          <section class="bg-primary p-4 rounded-3xl border border-theme">
-            <h3 class="text-sm font-semibold text-primary mb-2">Default highlight color</h3>
-            <div class="grid grid-cols-2 gap-3">
-              <button onclick="setDefaultHighlightColor('bg-yellow-500/20')" id="highlightYellow" class="w-full py-3 rounded-2xl bg-yellow-400 text-xs font-semibold text-primary">Yellow</button>
-              <button onclick="setDefaultHighlightColor('bg-sky-500/20')" id="highlightSky" class="w-full py-3 rounded-2xl bg-sky-400 text-xs font-semibold text-primary">Sky</button>
-              <button onclick="setDefaultHighlightColor('bg-emerald-500/20')" id="highlightEmerald" class="w-full py-3 rounded-2xl bg-emerald-400 text-xs font-semibold text-primary">Emerald</button>
-              <button onclick="setDefaultHighlightColor('bg-purple-500/20')" id="highlightPurple" class="w-full py-3 rounded-2xl bg-purple-400 text-xs font-semibold text-primary">Purple</button>
+            <div class="settingsFooter">
+              Changes save automatically and will be applied the next time you return to reading mode.
             </div>
-          </section>
+          </div>
         </div>
       </div>
     </div>
@@ -370,8 +682,27 @@
   </div>
 
   <div id="drawerOverlay" onclick="toggleDrawer(false)" class="fixed inset-0 bg-black/60 z-40 hidden backdrop-blur-xs"></div>
+  <div id="notesOverlay" onclick="closeStudyNotesPanel()" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
+  <div id="notesDrawer" class="notesDrawer closed">
+    <div class="w-full flex justify-center py-3 cursor-pointer" onclick="closeStudyNotesPanel()">
+      <div class="w-14 h-1.5 rounded-full bg-primary/50"></div>
+    </div>
+    <div class="px-5 pb-5 flex flex-col gap-4 h-full">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-xs uppercase tracking-[0.24em] text-muted">Study Notes</p>
+          <p class="text-lg font-semibold text-primary">Add your reflections.</p>
+        </div>
+      </div>
+      <div id="notesContent" class="notesContent flex-1 overflow-y-auto py-1 flex flex-col gap-3 text-xs no-scrollbar"></div>
+      <div class="flex gap-2 items-center pt-2 border-t border-theme">
+        <input id="notesInput" type="text" placeholder="Add study note..." class="notesInput flex-1 bg-primary border border-theme text-xs rounded-2xl px-3 py-3 focus:outline-none focus:border-emerald-500" />
+        <button onclick="addCardNote()" class="btnPrimary rounded-2xl px-4 py-3 text-xs font-semibold">Post</button>
+      </div>
+    </div>
+  </div>
 
-  <div id="saveSheet" class="fixed bottom-4 inset-x-4 bg-primary border border-theme p-4 rounded-2xl shadow-xl z-50 max-w-sm mx-auto transform translate-y-32 opacity-0 transition-all duration-300 pointer-events-none">
+  <!-- <div id="saveSheet" class="fixed bottom-4 inset-x-4 bg-primary border border-theme p-4 rounded-2xl shadow-xl z-50 max-w-sm mx-auto transform translate-y-32 opacity-0 transition-all duration-300 pointer-events-none">
     <div class="flex items-center justify-between">
       <p class="text-xs font-medium text-muted">Save passage to Album</p>
       <button onclick="closeSaveSheet()" class="text-xs text-muted underline">Dismiss</button>
@@ -381,7 +712,7 @@
       <span class="px-3 py-1 bg-indigo-950 text-indigo-400 text-xs rounded-full border border-indigo-900 font-medium whitespace-nowrap cursor-pointer">Inner Peace</span>
       <span class="px-3 py-1 bg-amber-950 text-amber-400 text-xs rounded-full border border-amber-900 font-medium whitespace-nowrap cursor-pointer">Wisdom</span>
     </div>
-  </div>
+  </div> -->
 
   <script src="vendor/strongs/greek/strongs-greek-dictionary.js"></script>
   <script src="vendor/strongs/hebrew/strongs-hebrew-dictionary.js"></script>
@@ -399,6 +730,7 @@
       drawerActiveTab: 'original',
       savedHighlights: [],
       savedNotes: {},
+      activeNotesCardId: null,
       availableTranslations: [],
       lastTap: 0,
       trendingCache: []
@@ -440,6 +772,14 @@
       { id: "2JHN", name: "2 John", chapters: 1 }, { id: "3JHN", name: "3 John", chapters: 1 },
       { id: "JUDE", name: "Jude", chapters: 1 }, { id: "REV", name: "Revelation", chapters: 22 }
     ];
+
+    const SINGLE_CHAPTER_BOOK_VERSES = {
+      PHM: 25,
+      JUDE: 25,
+      '2JHN': 13,
+      '3JHN': 14,
+      OBAD: 21
+    };
 
     const ORIGINAL_LANGUAGE_CACHE = {};
     const OT_BOOK_IDS = new Set([
@@ -726,6 +1066,15 @@
       renderFeed();
       switchView('trending');
       setupTabSwipeGestures();
+      closeStudyNotesPanel();
+      const notesInput = document.getElementById('notesInput');
+      notesInput?.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          addCardNote();
+        }
+      });
+      window.addEventListener('resize', () => updateTabBubble(state.activeView));
     });
 
     // Fetch and fill top free translation configurations
@@ -860,7 +1209,11 @@ async function renderFeed(customPassageData = null) {
           const chapterNum = state.currentChapter;
 
           // Bible API endpoint
-          const query = encodeURIComponent(`${bookName} ${chapterNum}`);
+          const isSingleChapterBook = currentBookData.chapters === 1 && chapterNum === 1;
+          const verseCount = SINGLE_CHAPTER_BOOK_VERSES[currentBookData.id];
+          const query = isSingleChapterBook && verseCount
+            ? encodeURIComponent(`${bookName} 1:1-${verseCount}`)
+            : encodeURIComponent(`${bookName} ${chapterNum}`);
           let url = `https://bible-api.com/${query}`;
 
           // Only append translation if supported
@@ -1141,35 +1494,24 @@ async function renderFeed(customPassageData = null) {
 
           <div class="heart-burst" id="heartBurst-${uniqueCardId}"><span class="material-symbols-rounded">favorite</span></div>
 
-          <div class="flex justify-between items-center z-10 pb-4 pt-2 border-t border-theme">
-            <div class="flex gap-4">
-              <button id="highlightBtn-${uniqueCardId}" class="highlight-toggle-button flex items-center gap-1.5 transition-colors ${cardMatch ? 'text-red-500 hover:text-red-400' : 'text-muted hover:text-emerald-400'}" onclick="toggleCardHighlight('${uniqueCardId}')">
+          <div class="flex justify-between items-center z-10 border-t border-theme/80 py-3">
+            <div class="flex gap-3">
+              <button id="highlightBtn-${uniqueCardId}" class="highlight-toggle-button flex items-center gap-1.5 rounded-full px-3 py-2 transition-all ${cardMatch ? 'text-red-500 hover:text-red-400' : 'text-muted hover:text-emerald-400'}" onclick="toggleCardHighlight('${uniqueCardId}')">
                 <span class="material-symbols-rounded">favorite</span>
               </button>
-              <button class="flex items-center gap-1.5 text-muted hover:text-emerald-400 transition-colors" onclick="openStudyNotes('${uniqueCardId}')">
+              <button class="flex items-center gap-2 rounded-full px-3 py-2 text-muted hover:text-emerald-400 transition-all" onclick="openStudyNotes('${uniqueCardId}')">
                 <span class="material-symbols-rounded text-xl">chat_bubble</span>
                 <span class="text-xs">Notes</span>
               </button>
             </div>
             
-            <div class="flex gap-3">
-              <button class="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-muted hover:text-emerald-400 transition-colors" onclick="openDeepDive('${uniqueCardId}')">
+            <div class="flex items-center">
+              <button class="w-10 h-10 rounded-full bg-primary border border-theme flex items-center justify-center text-muted hover:text-emerald-400 transition-all" onclick="openDeepDive('${uniqueCardId}')">
                 <span class="material-symbols-rounded">dictionary</span>
               </button>
             </div>
           </div>
 
-          <div id="notes-${uniqueCardId}" class="absolute inset-x-0 bottom-16 top-16 mx-4 bg-primary-soft backdrop-blur-md border border-theme p-4 rounded-xl flex flex-col justify-between hidden z-30">
-            <div class="flex justify-between items-center border-b border-theme pb-2">
-              <span class="text-xs font-semibold text-muted">Study Notes</span>
-              <button onclick="document.getElementById('notes-${uniqueCardId}').classList.add('hidden')" class="material-symbols-rounded text-sm text-muted">close</button>
-            </div>
-            <div id="notesContent-${uniqueCardId}" class="flex-1 overflow-y-auto py-2 flex flex-col gap-2.5 text-xs no-scrollbar"></div>
-            <div class="flex gap-1.5 pt-2 border-t border-theme">
-              <input id="notesInput-${uniqueCardId}" type="text" placeholder="Add study note..." class="bg-primary border border-theme text-xs rounded-lg px-2.5 py-2 flex-1 focus:outline-none focus:border-emerald-500">
-              <button onclick="addCardNote('${uniqueCardId}')" class="bg-emerald-600 text-white rounded-lg px-3 text-xs font-semibold">Post</button>
-            </div>
-          </div>
         </div>`;
     }
 
@@ -1292,17 +1634,35 @@ async function renderFeed(customPassageData = null) {
     }
 
     function openStudyNotes(cardId) {
-      const panel = document.getElementById(`notes-${cardId}`);
+      const panel = document.getElementById('notesDrawer');
+      const overlay = document.getElementById('notesOverlay');
       if (!panel) return;
-      panel.classList.toggle('hidden');
-      if (!panel.classList.contains('hidden')) {
-        renderCardNotes(cardId);
+
+      state.activeNotesCardId = cardId;
+      panel.classList.remove('closed');
+      panel.classList.add('open');
+      overlay?.classList.remove('hidden');
+      renderCardNotes(cardId);
+      const input = document.getElementById('notesInput');
+      input?.focus();
+    }
+
+    function closeStudyNotesPanel() {
+      const panel = document.getElementById('notesDrawer');
+      const overlay = document.getElementById('notesOverlay');
+      if (panel) {
+        panel.classList.remove('open');
+        panel.classList.add('closed');
       }
+      if (overlay) {
+        overlay.classList.add('hidden');
+      }
+      state.activeNotesCardId = null;
     }
 
     function renderCardNotes(cardId) {
-      const container = document.getElementById(`notesContent-${cardId}`);
-      const input = document.getElementById(`notesInput-${cardId}`);
+      const container = document.getElementById('notesContent');
+      const input = document.getElementById('notesInput');
       if (!container || !input) return;
 
       const notes = state.savedNotes[cardId] || [];
@@ -1322,8 +1682,10 @@ async function renderFeed(customPassageData = null) {
       input.value = '';
     }
 
-    function addCardNote(cardId) {
-      const input = document.getElementById(`notesInput-${cardId}`);
+    function addCardNote() {
+      const cardId = state.activeNotesCardId;
+      if (!cardId) return;
+      const input = document.getElementById('notesInput');
       if (!input) return;
       const text = input.value.trim();
       if (!text) return;
@@ -1509,6 +1871,20 @@ async function renderFeed(customPassageData = null) {
       return TAB_VIEWS[nextIndex] || null;
     }
 
+    function updateTabBubble(viewTarget) {
+      const bubble = document.getElementById('tabBubble');
+      const targetTab = document.getElementById(`tab-${viewTarget}`);
+      if (!bubble || !targetTab) return;
+
+      const tabRect = targetTab.getBoundingClientRect();
+      const parentRect = bubble.parentElement?.getBoundingClientRect();
+      if (!parentRect) return;
+
+      const x = tabRect.left - parentRect.left - 6; // 6px padding compensation
+      bubble.style.width = `${tabRect.width}px`;
+      bubble.style.transform = `translateX(${x}px)`;
+    }
+
     function setupTabSwipeGestures() {
       const container = document.querySelector('main');
       if (!container || !window.TouchEvent) return;
@@ -1609,12 +1985,14 @@ async function renderFeed(customPassageData = null) {
       // Clean tab selection highlighting CSS states
       ['trending', 'browse', 'saved'].forEach(v => {
         const tabEl = document.getElementById(`tab-${v}`);
-        tabEl.className = "flex-1 py-2 text-center rounded-lg text-muted transition-all";
+        tabEl.className = "tab-button";
+        tabEl.classList.remove('active');
       });
 
       // Activate chosen view matrix tracking layout updates
       const activeTabElement = document.getElementById(`tab-${viewTarget}`);
-      activeTabElement.className = "flex-1 py-2 text-center rounded-lg text-emerald-400 bg-primary-strong font-semibold shadow-sm transition-all";
+      activeTabElement.className = "tab-button active";
+      updateTabBubble(viewTarget);
 
       // animate the view switch and then trigger appropriate render hooks
       animateViewSwitch(viewTarget);
@@ -1638,12 +2016,12 @@ function returnToBrowse() {
 
       ['trending', 'browse', 'saved'].forEach(v => {
         const tabEl = document.getElementById(`tab-${v}`);
-        tabEl.className = "flex-1 py-2 text-center rounded-lg text-muted transition-all";
+        tabEl.className = "tab-button";
       });
 
       const browseTab = document.getElementById('tab-browse');
-      browseTab.className =
-        "flex-1 py-2 text-center rounded-lg text-emerald-400 bg-primary-strong font-semibold shadow-sm transition-all";
+      browseTab.className = "tab-button active";
+      updateTabBubble('browse');
     }
 
 // Dynamic generation of full books data elements grid mapping layout
@@ -1845,7 +2223,7 @@ function selectChapterAndNavigate(chapterNum) {
           <span class="animate-spin material-symbols-rounded text-3xl text-amber-400 mb-2">
             bolt
           </span>
-          Assembling Trending Fabric...
+          Loading popular passages...
         </div>
       `;
 
@@ -1887,14 +2265,16 @@ function selectChapterAndNavigate(chapterNum) {
         // Extract chapter number safely
         const chapter = data.verses[0]?.chapter || 1;
 
-        let cardHTML = `
-          <div class="absolute top-14 left-1/2 transform -translate-x-1/2 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider uppercase z-30 flex items-center gap-1 shadow-lg backdrop-blur-xs">
-            <span class="material-symbols-rounded text-xs animate-pulse">
-              local_fire_department
-            </span>
-            Suggested for you
-          </div>
-        `;
+        // let cardHTML = `
+        //   <div class="absolute top-14 left-1/2 transform -translate-x-1/2 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full text-[10px] font-semibold tracking-wider uppercase z-30 flex items-center gap-1 shadow-lg backdrop-blur-xs">
+        //     <span class="material-symbols-rounded text-xs animate-pulse">
+        //       local_fire_department
+        //     </span>
+        //     Suggested for you
+        //   </div>
+        // `;
+
+        let cardHTML = ``;
 
         cardHTML += compileCardMarkup(
           verses,
